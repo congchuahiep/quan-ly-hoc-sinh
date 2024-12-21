@@ -1,0 +1,98 @@
+[
+   {
+      "username": "teacher1",
+      "password": "password1",
+      "ten": "Nguyen",
+      "ho": "Van A",
+      "ngay_sinh": "1980-01-01",
+      "email": "teacher1@example.com",
+      "dien_thoai": "0123456789",
+      "dia_chi": "123 Street A",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nam"
+   },
+   {
+      "username": "teacher2",
+      "password": "password2",
+      "ten": "Tran",
+      "ho": "Thi B",
+      "ngay_sinh": "1981-02-02",
+      "email": "teacher2@example.com",
+      "dien_thoai": "0123456790",
+      "dia_chi": "456 Street B",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nu"
+   },
+   {
+      "username": "teacher3",
+      "password": "password3",
+      "ten": "Le",
+      "ho": "Van C",
+      "ngay_sinh": "1982-03-03",
+      "email": "teacher3@example.com",
+      "dien_thoai": "0123456791",
+      "dia_chi": "789 Street C",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nam"
+   },
+   {
+      "username": "teacher4",
+      "password": "password4",
+      "ten": "Pham",
+      "ho": "Thi D",
+      "ngay_sinh": "1983-04-04",
+      "email": "teacher4@example.com",
+      "dien_thoai": "0123456792",
+      "dia_chi": "101 Street D",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nu"
+   },
+   {
+      "username": "teacher5",
+      "password": "password5",
+      "ten": "Hoang",
+      "ho": "Van E",
+      "ngay_sinh": "1984-05-05",
+      "email": "teacher5@example.com",
+      "dien_thoai": "0123456793",
+      "dia_chi": "202 Street E",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nam"
+   },
+   {
+      "username": "teacher6",
+      "password": "password6",
+      "ten": "Vu",
+      "ho": "Thi F",
+      "ngay_sinh": "1985-06-06",
+      "email": "teacher6@example.com",
+      "dien_thoai": "0123456794",
+      "dia_chi": "303 Street F",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nu"
+   },
+   {
+      "username": "teacher7",
+      "password": "password7",
+      "ten": "Dang",
+      "ho": "Van G",
+      "ngay_sinh": "1986-07-07",
+      "email": "teacher7@example.com",
+      "dien_thoai": "0123456795",
+      "dia_chi": "404 Street G",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nam"
+   },
+   {
+      "username": "teacher8",
+      "password": "password8",
+      "ten": "Bui",
+      "ho": "Thi H",
+      "ngay_sinh": "1987-08-08",
+      "email": "teacher8@example.com",
+      "dien_thoai": "0123456796",
+      "dia_chi": "505 Street H",
+      "loai_nguoi_dung": "GiaoVien",
+      "gioi_tinh": "Nu"
+   }
+]
