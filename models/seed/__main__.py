@@ -39,7 +39,7 @@ if __name__ == '__main__':
             data = json.load(file)
             for item in data:
                 mon_hoc = MonHoc(
-                    ten_mon=item['ten_mon']
+                    ten_mon_hoc=item['ten_mon_hoc']
                 )
                 db.session.add(mon_hoc)
             db.session.commit()
