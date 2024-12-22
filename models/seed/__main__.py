@@ -17,7 +17,7 @@ if __name__ == '__main__':
         db.create_all()
 
         # Tạo GiaoVien
-        with open(giao_vien_path, 'r') as file:
+        with open(giao_vien_path, 'r', encoding= 'utf-8') as file:
             data = json.load(file)
             for item in data:
                 giao_vien = GiaoVien(
@@ -35,7 +35,7 @@ if __name__ == '__main__':
                 db.session.add(giao_vien)
             db.session.commit()
         
-        with open(mon_hoc_path, 'r') as file:
+        with open(mon_hoc_path, 'r', encoding= 'utf-8') as file:
             data = json.load(file)
             for item in data:
                 mon_hoc = MonHoc(
