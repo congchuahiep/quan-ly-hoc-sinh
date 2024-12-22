@@ -127,7 +127,6 @@ class MonHoc(db.Model):
     __tablename__ = 'MonHoc'
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten_mon_hoc = Column(String(50))
-    so_tiet = Column(Integer)
 
     bang_diems = relationship('BangDiem', back_populates='mon_hoc', lazy=True)
     giao_viens = relationship('GiaoVien', secondary=day_mon, back_populates='day_mon')
