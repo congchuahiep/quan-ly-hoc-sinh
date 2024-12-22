@@ -132,6 +132,10 @@ class MonHoc(db.Model):
     giao_viens = relationship('GiaoVien', secondary=day_mon, back_populates='day_mon')
     thong_ke_mon_hocs = relationship('ThongKeMonHoc', back_populates='mon_hoc', lazy=True)
 
+    def __init__(self, ten_mon_hoc):
+        self.ten_mon_hoc = ten_mon_hoc
+
+
 class HocKy(db.Model):
     __tablename__ = 'HocKy'
     id = Column(Integer, primary_key=True)
