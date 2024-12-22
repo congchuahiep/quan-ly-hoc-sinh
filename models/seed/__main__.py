@@ -1,7 +1,7 @@
 import json
 import hashlib
 from app import app, db
-from models import GiaoVien
+from models import GiaoVien, MonHoc
 
 import os
 
@@ -10,6 +10,7 @@ script_dir = os.path.dirname(__file__)
 
 # Khởi tạo đường dẫn tuyệt đối cho các tệp json
 giao_vien_path = os.path.join(script_dir, 'giaovien.json')
+mon_hoc_path = os.path.join(script_dir, 'monhoc.json')
 
 if __name__ == '__main__':
     with app.app_context():
@@ -32,4 +33,13 @@ if __name__ == '__main__':
                     gioi_tinh=item['gioi_tinh']
                 )
                 db.session.add(giao_vien)
+            db.session.commit()
+        
+        with open(mon_hoc_path, 'r') as file:
+            data = json.load(file)
+            for item in data:
+                mon_hoc = MonHoc(
+                    ten_mon=item['ten_mon']
+                )
+                db.session.add(mon_hoc)
             db.session.commit()
