@@ -5,10 +5,10 @@ from models import GiaoVien
 
 import os
 
-# Get the directory of the current script
+# Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
 
-# Construct the absolute path to the JSON file
+# Khởi tạo đường dẫn tuyệt đối cho các tệp json
 giao_vien_path = os.path.join(script_dir, 'giaovien.json')
 
 if __name__ == '__main__':
