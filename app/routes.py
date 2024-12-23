@@ -5,32 +5,11 @@ from app import app
 from app.auth import auth_user, role_required
 
 
-@app.route('/base')
-def base():
-    
-    nav_items = [
-        {'href': 'base', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
-        {'href': 'base2', 'status': 'link-body-emphasis', 'icon': '', 'title': 'Contact'},
-        {'href': 'login', 'status': 'link-body-emphasis', 'icon': '', 'title': 'Setting'},
-    ]
-    
-    return render_template('layout.html', title='Testing...', nav_items=nav_items)
-
-
-@app.route('/base2')
-def base2():
-    
-    nav_items = [
-        {'href': 'base', 'icon': '<i class="bi bi-house me-1"></i>', 'title': 'Home'},
-        {'href': 'base2', 'icon': '', 'title': 'Contact'},
-        {'href': 'login', 'icon': '', 'title': 'Setting'},
-    ]
-    
-    return render_template('layout.html', title='Testing...', nav_items=nav_items)
-
-
 @app.route('/')
 def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
     return render_template('login.html', title='Login')
 
 
