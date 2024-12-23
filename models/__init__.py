@@ -48,8 +48,32 @@ class NguoiDung(db.Model, UserMixin):
     def get_user_id(self):
         return self.id
         
+    def get_name(self):
+        return self.ho + ' ' + self.ten
+        
     def check_loai_nguoi_dung(self, loai_nguoi_dung: str):
         return self.loai_nguoi_dung == loai_nguoi_dung
+    
+    def get_nav_item_by_role(self):
+        if self.check_loai_nguoi_dung('QuanTri'):
+            return [
+                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
+                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'login', 'icon': '', 'title': 'Setting'},
+            ]
+        if self.check_loai_nguoi_dung('GiaoVien'):
+            return [
+                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Home'},
+                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'login', 'icon': '', 'title': 'Setting'},
+            ]
+        if self.check_loai_nguoi_dung('NhanVien'):
+            return [
+                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Home'},
+                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'login', 'icon': '', 'title': 'Setting'},
+            ]
+        return []
         
     
 class GiaoVien(NguoiDung):

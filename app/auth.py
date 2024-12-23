@@ -39,26 +39,3 @@ def auth_user(username, password):
         return False
 
     return user
-
-
-def get_nav_item_by_role():
-    print(current_user._get_current_object())
-    if current_user._get_current_object().check_loai_nguoi_dung('QuanTri'):
-        return [
-            {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
-            {'href': 'login', 'icon': '', 'title': 'Contact'},
-            {'href': 'login', 'icon': '', 'title': 'Setting'},
-        ]
-    if current_user._get_current_object().check_loai_nguoi_dung('GiaoVien'):
-        return [
-            {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Home'},
-            {'href': 'login', 'icon': '', 'title': 'Contact'},
-            {'href': 'login', 'icon': '', 'title': 'Setting'},
-        ]
-    if current_user._get_current_object().check_loai_nguoi_dung('NhanVien'):
-        return [
-            {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Home'},
-            {'href': 'login', 'icon': '', 'title': 'Contact'},
-            {'href': 'login', 'icon': '', 'title': 'Setting'},
-        ]
-    return []

@@ -2,7 +2,7 @@ from flask import redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user, current_user
 
 from app import app
-from app.auth import auth_user, role_required, get_nav_item_by_role
+from app.auth import auth_user, role_required
 
 
 @app.route('/base')
@@ -58,8 +58,12 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    nav_items = get_nav_item_by_role()
-    return render_template('dashboard.html', title='Tổng quan', nav_items=nav_items)
+    user = current_user._get_current_object()
+    
+    nav_items = user.get_nav_item_by_role()
+    user_fullname = user.get_name()
+    return render_template('dashboard.html', title='Tổng quan', nav_items=nav_items, user_fullname=user_fullname)
