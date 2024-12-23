@@ -1,9 +1,9 @@
 import hashlib
 from sqlalchemy import Column, Enum, Integer, String, Float, ForeignKey, Date
 from sqlalchemy.orm import relationship
-from app import app, db
-
 from flask_login import UserMixin
+
+from app import db
 
 day_mon = db.Table('DayMon', 
     Column('giao_vien_id', Integer, ForeignKey('GiaoVien.id'), primary_key=True),
@@ -29,6 +29,9 @@ class NguoiDung(db.Model, UserMixin):
         'polymorphic_identity': 'NguoiDung',
         'polymorphic_on': loai_nguoi_dung
     }
+    
+    def __str__(self):
+        return self.username
 
     def __init__(self, username, password, ten, ho, ngay_sinh, email, dien_thoai, dia_chi, gioi_tinh, loai_nguoi_dung):
         self.username = username
@@ -41,6 +44,12 @@ class NguoiDung(db.Model, UserMixin):
         self.dia_chi = dia_chi
         self.gioi_tinh = gioi_tinh
         self.loai_nguoi_dung = loai_nguoi_dung
+        
+    def get_user_id(self):
+        return self.id
+        
+    def check_loai_nguoi_dung(self, loai_nguoi_dung: str):
+        return self.loai_nguoi_dung == loai_nguoi_dung
         
     
 class GiaoVien(NguoiDung):

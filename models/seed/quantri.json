@@ -1,0 +1,26 @@
+[
+    {
+       "username": "admin1",
+       "password": "deptrai",
+       "ten": "Hiệp",
+       "ho": "Trần Hoàng",
+       "ngay_sinh": "2004-04-18",
+       "email": "congchuahiep@deptrai.com",
+       "dien_thoai": "0123456789",
+       "dia_chi": "2225 Phạm Thế Hiển",
+       "loai_nguoi_dung": "QuanTri",
+       "gioi_tinh": "Nam"
+    },
+    {
+        "username": "admin2",
+        "password": "deptrai",
+        "ten": "Hiệp",
+        "ho": "Hoàng Minh",
+        "ngay_sinh": "2004-01-01",
+        "email": "minhhiep@deptrai.com",
+        "dien_thoai": "0123456789",
+        "dia_chi": "Đẹp trai Gò Vấp",
+        "loai_nguoi_dung": "QuanTri",
+        "gioi_tinh": "Nam"
+     }
+]
