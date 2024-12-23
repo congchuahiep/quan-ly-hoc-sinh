@@ -10,6 +10,7 @@ day_mon = db.Table('DayMon',
     Column('mon_hoc_id', Integer, ForeignKey('MonHoc.id'), primary_key=True)
 )
 
+
 class NguoiDung(db.Model, UserMixin):
     __tablename__ = 'NguoiDung'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -54,6 +55,7 @@ class GiaoVien(NguoiDung):
         'polymorphic_identity': 'GiaoVien',
     }
 
+
 class NhanVien(NguoiDung):
     __tablename__ = 'NhanVien'
     id = Column(Integer, ForeignKey('NguoiDung.id'), primary_key=True)
@@ -62,6 +64,7 @@ class NhanVien(NguoiDung):
         'polymorphic_identity': 'NhanVien',
     }
 
+
 class QuanTri(NguoiDung):
     __tablename__ = 'QuanTri'
     id = Column(Integer, ForeignKey('NguoiDung.id'), primary_key=True)
@@ -69,6 +72,7 @@ class QuanTri(NguoiDung):
     __mapper_args__ = {
         'polymorphic_identity': 'QuanTri',
     }
+
 
 class LopHoc(db.Model):
     __tablename__ = 'LopHoc'
