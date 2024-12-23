@@ -45,12 +45,6 @@ class NguoiDung(db.Model, UserMixin):
         self.gioi_tinh = gioi_tinh
         self.loai_nguoi_dung = loai_nguoi_dung
         
-    def get_user_id(self):
-        return self.id
-        
-    def get_name(self):
-        return self.ho + ' ' + self.ten
-        
     def check_loai_nguoi_dung(self, loai_nguoi_dung: str):
         return self.loai_nguoi_dung == loai_nguoi_dung
     
