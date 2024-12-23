@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %}
 <div
    class="d-flex justify-content-center align-items-center"
-   style="height: 82vh"
+   style="height: 82vh; width: 100%"
 >
    <div class="container card shadow p-4" style="max-width: 500px">
       <h2 class="my-5 text-center fw-bold">Hệ thống quản lý học sinh</h2>
@@ -54,6 +54,34 @@
       </form>
    </div>
 </div>
+
+<script>
+   (() => {
+      "use strict";
+
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      const forms = document.querySelectorAll(".needs-validation");
+
+      // Loop over them and prevent submission
+      Array.from(forms).forEach((form) => {
+         form.addEventListener(
+            "submit",
+            (event) => {
+               if (!form.checkValidity()) {
+                  event.preventDefault();
+                  event.stopPropagation();
+               }
+
+               form.classList.add("was-validated");
+            },
+            false
+         );
+      });
+   })();
+</script>
+{% endblock %}
+
+{% block footer %}
 <footer class="container">
    <hr />
    <div class="d-flex flex-column justify-content-center align-items-center">
@@ -84,29 +112,4 @@
       </div>
    </div>
 </footer>
-
-<script>
-   (() => {
-      "use strict";
-
-      // Fetch all the forms we want to apply custom Bootstrap validation styles to
-      const forms = document.querySelectorAll(".needs-validation");
-
-      // Loop over them and prevent submission
-      Array.from(forms).forEach((form) => {
-         form.addEventListener(
-            "submit",
-            (event) => {
-               if (!form.checkValidity()) {
-                  event.preventDefault();
-                  event.stopPropagation();
-               }
-
-               form.classList.add("was-validated");
-            },
-            false
-         );
-      });
-   })();
-</script>
 {% endblock %}

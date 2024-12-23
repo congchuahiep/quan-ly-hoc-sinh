@@ -44,5 +44,15 @@ def dashboard():
     user = current_user._get_current_object()
     
     nav_items = user.get_nav_item_by_role()
-    user_fullname = user.get_name()
-    return render_template('dashboard.html', title='Tổng quan', nav_items=nav_items, user_fullname=user_fullname)
+    user_fullname = user.ho + ' ' + user.ten
+    user_role = user.loai_nguoi_dung
+    
+    data = {
+        "username": "Hoàng Hiệp",
+        "hoc_sinh": 4509,
+        "giao_vien": 121,
+        "nhan_vien": 21,
+        "ti_le": "100%"
+    }
+    
+    return render_template('dashboard.html', title='Tổng quan', nav_items=nav_items, user_fullname=user_fullname, data=data, user_role=user_role)

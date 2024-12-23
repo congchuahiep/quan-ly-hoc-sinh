@@ -1,1 +1,36 @@
-{% extends "sidebar.html" %}
+{% extends "sidebar.html" %} {% block content %}
+<div class="container">
+   <div class="d-flex flex-column justify-content-evenly" style="height: 100%">
+      <div class="text-center">
+         <h1>Xin chào, {{ user_fullname }}!</h1>
+         <p>Hãy chọn bất kỳ chức năng nào bên tay phải để bắt đầu làm việc</p>
+      </div>
+      <div class="row m-4 d-flex justify-content-center gap-3">
+         <div class="col-md-5 p-0">
+            <div class="card p-3">
+               <h5 class="mt-2">Học Sinh</h5>
+               <p>{{ data.hoc_sinh }}</p>
+            </div>
+         </div>
+         <div class="col-md-5 p-0">
+            <div class="card p-3">
+               <h5 class="mt-2">Giáo Viên</h5>
+               <p>{{ data.giao_vien }}</p>
+            </div>
+         </div>
+         <div class="col-md-5 p-0">
+            <div class="card p-3">
+               <h5 class="mt-2">Nhân Viên</h5>
+               <p>{{ data.nhan_vien }}</p>
+            </div>
+         </div>
+         <div class="col-md-5 p-0">
+            <div class="card p-3">
+               <h5 class="mt-2">Tỉ Lệ Đạt</h5>
+               <p>{{ data.ti_le }}</p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
