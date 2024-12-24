@@ -47,27 +47,6 @@ class NguoiDung(db.Model, UserMixin):
         
     def check_loai_nguoi_dung(self, loai_nguoi_dung: str):
         return self.loai_nguoi_dung == loai_nguoi_dung
-    
-    def get_nav_item_by_role(self):
-        if self.check_loai_nguoi_dung('QuanTri'):
-            return [
-                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
-                {'href': 'login', 'icon': '', 'title': 'Contact'},
-                {'href': 'login', 'icon': '', 'title': 'Setting'},
-            ]
-        if self.check_loai_nguoi_dung('GiaoVien'):
-            return [
-                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Home'},
-                {'href': 'login', 'icon': '', 'title': 'Contact'},
-                {'href': 'login', 'icon': '', 'title': 'Setting'},
-            ]
-        if self.check_loai_nguoi_dung('NhanVien'):
-            return [
-                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Home'},
-                {'href': 'login', 'icon': '', 'title': 'Contact'},
-                {'href': 'login', 'icon': '', 'title': 'Setting'},
-            ]
-        return []
         
     
 class GiaoVien(NguoiDung):
@@ -81,6 +60,13 @@ class GiaoVien(NguoiDung):
     __mapper_args__ = {
         'polymorphic_identity': 'GiaoVien',
     }
+    
+    def get_nav_item_by_role(self):
+        return [
+                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
+                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'login', 'icon': '', 'title': 'Setting'},
+            ]
 
 
 class NhanVien(NguoiDung):
@@ -90,6 +76,13 @@ class NhanVien(NguoiDung):
     __mapper_args__ = {
         'polymorphic_identity': 'NhanVien',
     }
+    def get_nav_item_by_role(self):
+        return [
+                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
+                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'login', 'icon': '', 'title': 'Setting'},
+            ]    
+    
 
 
 class QuanTri(NguoiDung):
@@ -99,6 +92,13 @@ class QuanTri(NguoiDung):
     __mapper_args__ = {
         'polymorphic_identity': 'QuanTri',
     }
+    
+    def get_nav_item_by_role(self):
+        return [
+                {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
+                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'login', 'icon': '', 'title': 'Setting'},
+            ]
 
 
 class LopHoc(db.Model):
