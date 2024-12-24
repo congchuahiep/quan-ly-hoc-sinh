@@ -71,18 +71,7 @@ class GiaoVien(NguoiDung):
         ]
     
     def get_dashboard_data(self):
-        
-        total_hoc_sinh = db.session.query(HocSinh).count()
-        total_giao_vien = db.session.query(GiaoVien).count()
-        total_nhan_vien = db.session.query(NhanVien).count()
-        ti_le_dat = str(100) + "%"
-        
-        return [
-            {'title': 'Học sinh', 'value': total_hoc_sinh, 'icon': '<i class="bi bi-person fs-2"></i>'},
-            {'title': 'Giáo viên', 'value': total_giao_vien, 'icon': '<i class="bi bi-person-workspace fs-2"></i>'},
-            {'title': 'Nhân viên', 'value': total_nhan_vien, 'icon': '<i class="bi bi-briefcase fs-2"></i>'},
-            {'title': 'Tỉ lệ đạt', 'value': ti_le_dat, 'icon': '<i class="bi bi-bar-chart-line fs-2"></i>'}
-        ]
+        return []
     
     def get_role(self):
         return "Giáo viên"
