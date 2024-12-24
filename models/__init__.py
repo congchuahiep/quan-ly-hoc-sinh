@@ -169,6 +169,12 @@ class LopHoc(db.Model):
     giao_vien_chu_nhiem = relationship('GiaoVien', back_populates='lop_chu_nhiem')
     giao_vien_day_lop = relationship('DayLop', back_populates='lop_hoc')
     hoc_sinhs = relationship('HocSinhLop', back_populates='lop_hoc', lazy=True)
+    
+    def __init__(self, ten_lop, so_phong, khoi_lop, giao_vien_chu_nhiem_id):
+        self.ten_lop = ten_lop
+        self.so_phong = so_phong
+        self.khoi_lop = khoi_lop
+        self.giao_vien_chu_nhiem_id = giao_vien_chu_nhiem_id
 
 
 class DayLop(db.Model):
