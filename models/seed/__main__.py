@@ -28,6 +28,7 @@ if __name__ == '__main__':
                 giao_vien = GiaoVien(
                     username=item['username'],
                     password=item['password'],
+                    avatar=item['avatar'],
                     ten=item['ten'],
                     ho=item['ho'],
                     ngay_sinh=item['ngay_sinh'],
@@ -57,6 +58,7 @@ if __name__ == '__main__':
                 quan_tri = QuanTri(
                     username=item['username'],
                     password=item['password'],
+                    avatar=item['avatar'],
                     ten=item['ten'],
                     ho=item['ho'],
                     ngay_sinh=item['ngay_sinh'],

@@ -6,30 +6,19 @@
          <p>Hãy chọn bất kỳ chức năng nào bên tay phải để bắt đầu làm việc</p>
       </div>
       <div class="row m-4 d-flex justify-content-center gap-3">
+         {% for item in data %}
          <div class="col-md-5 p-0">
-            <div class="card p-3">
-               <h5 class="mt-2">Học Sinh</h5>
-               <p>{{ data.hoc_sinh }}</p>
+            <div class="card p-3 d-flex flex-row align-items-center gap-3">
+               <div class="icon-circle">
+                  {{ item.icon|safe }}
+              </div>
+               <div>
+                  <h5 class="mt-2">{{ item.title }}</h5>
+                  <p>{{ item.value }}</p>
+               </div>
             </div>
          </div>
-         <div class="col-md-5 p-0">
-            <div class="card p-3">
-               <h5 class="mt-2">Giáo Viên</h5>
-               <p>{{ data.giao_vien }}</p>
-            </div>
-         </div>
-         <div class="col-md-5 p-0">
-            <div class="card p-3">
-               <h5 class="mt-2">Nhân Viên</h5>
-               <p>{{ data.nhan_vien }}</p>
-            </div>
-         </div>
-         <div class="col-md-5 p-0">
-            <div class="card p-3">
-               <h5 class="mt-2">Tỉ Lệ Đạt</h5>
-               <p>{{ data.ti_le }}</p>
-            </div>
-         </div>
+         {% endfor %}
       </div>
    </div>
 </div>

@@ -14,15 +14,16 @@ day_mon = db.Table('DayMon',
 class NguoiDung(db.Model, UserMixin):
     __tablename__ = 'NguoiDung'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(50))
-    password = Column(String(256))
-    ten = Column(String(50))
-    ho = Column(String(120))
-    ngay_sinh = Column(Date)
-    email = Column(String(50))
-    dien_thoai = Column(String(15))
-    dia_chi = Column(String(50))
-    gioi_tinh = Column(Enum('Nam', 'Nu'))
+    username = Column(String(50), unique=True, nullable=False)
+    password = Column(String(256), nullable=False)
+    avatar = Column(String(120), nullable=True)
+    ten = Column(String(50), nullable=False)
+    ho = Column(String(120), nullable=False)
+    ngay_sinh = Column(Date, nullable=False)
+    email = Column(String(50), nullable=False)
+    dien_thoai = Column(String(15), nullable=False)
+    dia_chi = Column(String(50), nullable=False)
+    gioi_tinh = Column(Enum('Nam', 'Nu'), nullable=False)
     loai_nguoi_dung = Column(Enum('NhanVien', 'GiaoVien', 'QuanTri'), nullable=False)
 
     __mapper_args__ = {
@@ -33,9 +34,10 @@ class NguoiDung(db.Model, UserMixin):
     def __str__(self):
         return self.username
 
-    def __init__(self, username, password, ten, ho, ngay_sinh, email, dien_thoai, dia_chi, gioi_tinh, loai_nguoi_dung):
+    def __init__(self, username, password, avatar, ten, ho, ngay_sinh, email, dien_thoai, dia_chi, gioi_tinh, loai_nguoi_dung):
         self.username = username
         self.password = hashlib.sha256(password.encode()).hexdigest()
+        self.avatar = avatar
         self.ten = ten
         self.ho = ho
         self.ngay_sinh = ngay_sinh
@@ -66,7 +68,24 @@ class GiaoVien(NguoiDung):
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
                 {'href': 'login', 'icon': '', 'title': 'Contact'},
                 {'href': 'login', 'icon': '', 'title': 'Setting'},
-            ]
+        ]
+    
+    def get_dashboard_data(self):
+        
+        total_hoc_sinh = db.session.query(HocSinh).count()
+        total_giao_vien = db.session.query(GiaoVien).count()
+        total_nhan_vien = db.session.query(NhanVien).count()
+        ti_le_dat = str(100) + "%"
+        
+        return [
+            {'title': 'Học sinh', 'value': total_hoc_sinh, 'icon': '<i class="bi bi-person fs-2"></i>'},
+            {'title': 'Giáo viên', 'value': total_giao_vien, 'icon': '<i class="bi bi-person-workspace fs-2"></i>'},
+            {'title': 'Nhân viên', 'value': total_nhan_vien, 'icon': '<i class="bi bi-briefcase fs-2"></i>'},
+            {'title': 'Tỉ lệ đạt', 'value': ti_le_dat, 'icon': '<i class="bi bi-bar-chart-line fs-2"></i>'}
+        ]
+    
+    def get_role(self):
+        return "Giáo viên"
 
 
 class NhanVien(NguoiDung):
@@ -76,13 +95,32 @@ class NhanVien(NguoiDung):
     __mapper_args__ = {
         'polymorphic_identity': 'NhanVien',
     }
+    
+
+    
+    def get_dashboard_data(self):
+        
+        total_hoc_sinh = db.session.query(HocSinh).count()
+        total_giao_vien = db.session.query(GiaoVien).count()
+        total_nhan_vien = db.session.query(NhanVien).count()
+        ti_le_dat = str(100) + "%"
+        
+        return [
+            {'title': 'Học sinh', 'value': total_hoc_sinh, 'icon': '<i class="bi bi-person fs-2"></i>'},
+            {'title': 'Giáo viên', 'value': total_giao_vien, 'icon': '<i class="bi bi-person-workspace fs-2"></i>'},
+            {'title': 'Nhân viên', 'value': total_nhan_vien, 'icon': '<i class="bi bi-briefcase fs-2"></i>'},
+            {'title': 'Tỉ lệ đạt', 'value': ti_le_dat, 'icon': '<i class="bi bi-bar-chart-line fs-2"></i>'}
+        ]
+    
     def get_nav_item_by_role(self):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
                 {'href': 'login', 'icon': '', 'title': 'Contact'},
                 {'href': 'login', 'icon': '', 'title': 'Setting'},
-            ]    
+        ]
     
+    def get_role(self):
+        return "Nhân viên"
 
 
 class QuanTri(NguoiDung):
@@ -93,12 +131,29 @@ class QuanTri(NguoiDung):
         'polymorphic_identity': 'QuanTri',
     }
     
+    def get_dashboard_data(self):
+        
+        total_hoc_sinh = db.session.query(HocSinh).count()
+        total_giao_vien = db.session.query(GiaoVien).count()
+        total_nhan_vien = db.session.query(NhanVien).count()
+        ti_le_dat = str(100) + "%"
+        
+        return [
+            {'title': 'Học sinh', 'value': total_hoc_sinh, 'icon': '<i class="bi bi-person fs-2"></i>'},
+            {'title': 'Giáo viên', 'value': total_giao_vien, 'icon': '<i class="bi bi-person-workspace fs-2"></i>'},
+            {'title': 'Nhân viên', 'value': total_nhan_vien, 'icon': '<i class="bi bi-briefcase fs-2"></i>'},
+            {'title': 'Tỉ lệ đạt', 'value': ti_le_dat, 'icon': '<i class="bi bi-bar-chart-line fs-2"></i>'}
+        ]
+    
     def get_nav_item_by_role(self):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
                 {'href': 'login', 'icon': '', 'title': 'Contact'},
                 {'href': 'login', 'icon': '', 'title': 'Setting'},
-            ]
+        ]
+        
+    def get_role(self):
+        return "Quản trị"
 
 
 class LopHoc(db.Model):

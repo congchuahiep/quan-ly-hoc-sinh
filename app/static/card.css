@@ -9,3 +9,17 @@
    transition-duration: 300ms;
    transition-timing-function: ease-out;
 }
+
+.rounded {
+   border-radius: rounded;
+}
+
+.icon-circle {
+   width: 50px; /* Đặt chiều rộng của hình tròn */
+   height: 50px; /* Đặt chiều cao của hình tròn */
+   border-radius: 50%; /* Tạo hình tròn */
+   background-color: #f0f0f0; /* Màu nền của hình tròn */
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
