@@ -47,6 +47,13 @@ class NguoiDung(db.Model, UserMixin):
         self.gioi_tinh = gioi_tinh
         self.loai_nguoi_dung = loai_nguoi_dung
         
+    def get_basic_info(self):
+        return {
+            'fullname': self.ho + ' ' + self.ten,
+            'avatar': self.avatar,
+            'role': self.get_role()
+        }
+        
     def check_loai_nguoi_dung(self, loai_nguoi_dung: str):
         return self.loai_nguoi_dung == loai_nguoi_dung
         
@@ -66,7 +73,7 @@ class GiaoVien(NguoiDung):
     def get_nav_item_by_role(self):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
-                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'score', 'icon': '<i class="bi bi-book me-2"></i>', 'title': 'Quản lý bảng điểm'},
                 {'href': 'login', 'icon': '', 'title': 'Setting'},
         ]
     

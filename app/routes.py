@@ -46,19 +46,30 @@ def logout():
 def dashboard():
     user = current_user._get_current_object()
     
+    basic_info = user.get_basic_info()
     nav_items = user.get_nav_item_by_role()
-    user_fullname = user.ho + ' ' + user.ten
-    user_role = user.get_role()
-    user_avatar = user.avatar
-    
     data = user.get_dashboard_data()
     
     return render_template(
         'dashboard.html',
         title='Tổng quan',
         nav_items=nav_items,
-        user_fullname=user_fullname,
+        basic_info=basic_info,
         data=data,
-        user_role=user_role,
-        user_avatar=user_avatar
+    )
+    
+@app.route('/score')
+@login_required
+@role_required('GiaoVien')
+def score():
+    user = current_user._get_current_object()
+    
+    basic_info = user.get_basic_info()
+    nav_items = user.get_nav_item_by_role()
+    
+    return render_template(
+        'score.html',
+        title='Quản lý bảng điểm',
+        basic_info=basic_info,
+        nav_items=nav_items
     )
