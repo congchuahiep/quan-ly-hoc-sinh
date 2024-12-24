@@ -2,6 +2,7 @@
    {
       "username": "teacher1",
       "password": "password1",
+      "avatar": "https://robohash.org/iddoloremrepellat.png?size=48x48&set=set1",
       "ten": "A",
       "ho": "Nguyễn Văn",
       "ngay_sinh": "1980-01-01",
@@ -14,6 +15,7 @@
    {
       "username": "teacher2",
       "password": "password2",
+      "avatar": "https://robohash.org/veniamquisfuga.png?size=48x48&set=set1",
       "ten": "B",
       "ho": "Trần Thị",
       "ngay_sinh": "1981-02-02",
@@ -26,6 +28,7 @@
    {
       "username": "teacher3",
       "password": "password3",
+      "avatar": "https://robohash.org/ducimusnihilut.png?size=48x48&set=set1",
       "ten": "C",
       "ho": "Lê Văn",
       "ngay_sinh": "1982-03-03",
@@ -38,6 +41,7 @@
    {
       "username": "teacher4",
       "password": "password4",
+      "avatar": "https://robohash.org/omnisrepudiandaedolor.png?size=48x48&set=set1",
       "ten": "D",
       "ho": "Phạm Thị",
       "ngay_sinh": "1983-04-04",
@@ -50,6 +54,7 @@
    {
       "username": "teacher5",
       "password": "password5",
+      "avatar": "https://robohash.org/quiseumdolor.png?size=48x48&set=set1",
       "ten": "E",
       "ho": "Hoàng Văn",
       "ngay_sinh": "1984-05-05",
@@ -62,6 +67,7 @@
    {
       "username": "teacher6",
       "password": "password6",
+      "avatar": "https://robohash.org/etlaboreipsam.png?size=48x48&set=set1",
       "ten": "F",
       "ho": "Vũ Thị",
       "ngay_sinh": "1985-06-06",
@@ -74,6 +80,7 @@
    {
       "username": "teacher7",
       "password": "password7",
+      "avatar": "https://robohash.org/nostrumautex.png?size=48x48&set=set1",
       "ten": "G",
       "ho": "Đặng Văn",
       "ngay_sinh": "1986-07-07",
@@ -86,6 +93,7 @@
    {
       "username": "teacher8",
       "password": "password8",
+      "avatar": "https://robohash.org/idestporro.png?size=48x48&set=set1",
       "ten": "H",
       "ho": "Bùi Thị",
       "ngay_sinh": "1987-08-08",
@@ -98,6 +106,7 @@
    {
       "username": "teacher9",
       "password": "password9",
+      "avatar": "https://robohash.org/consequaturvoluptatesprovident.png?size=48x48&set=set1",
       "ten": "I",
       "ho": "Ngô Văn",
       "ngay_sinh": "1988-09-09",
@@ -110,6 +119,7 @@
    {
       "username": "teacher10",
       "password": "password10",
+      "avatar": "https://robohash.org/pariaturcumqueanimi.png?size=48x48&set=set1",
       "ten": "K",
       "ho": "Trần Thị",
       "ngay_sinh": "1989-10-10",
@@ -122,6 +132,7 @@
    {
       "username": "teacher11",
       "password": "password11",
+      "avatar": "https://robohash.org/velitaliasillum.png?size=48x48&set=set1",
       "ten": "L",
       "ho": "Lê Văn",
       "ngay_sinh": "1990-11-11",
@@ -134,6 +145,7 @@
    {
       "username": "teacher12",
       "password": "password12",
+      "avatar": "https://robohash.org/faceresapientevoluptatem.png?size=48x48&set=set1",
       "ten": "M",
       "ho": "Phạm Thị",
       "ngay_sinh": "1991-12-12",
