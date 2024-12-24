@@ -14,6 +14,7 @@
                class="form-control {% if error %}is-invalid{% endif %}"
                value="{{ request.form.get('username', '') }}"
                placeholder="Tên tài khoản"
+               autocomplete="off"
                required
             />
             <label for="username" class="form-label">Tên tài khoản</label>
@@ -26,6 +27,7 @@
                class="form-control {% if error %}is-invalid{% endif %}"
                value="{{ request.form.get('password', '') }}"
                placeholder="Mật khẩu"
+               autocomplete="off"
                required
             />
             <label for="password" class="form-label">Mật khẩu</label>
