@@ -10,6 +10,11 @@ day_mon = db.Table('DayMon',
     Column('mon_hoc_id', Integer, ForeignKey('MonHoc.id'), primary_key=True)
 )
 
+lop_hoc_ky = db.Table('LopHocKy', 
+    Column('lop_hoc_id', Integer, ForeignKey('LopHoc.id'), primary_key=True),
+    Column('hoc_ky_id', Integer, ForeignKey('HocKy.id'), primary_key=True)
+)
+
 
 class NguoiDung(db.Model, UserMixin):
     __tablename__ = 'NguoiDung'
@@ -155,11 +160,12 @@ class QuanTri(NguoiDung):
 class LopHoc(db.Model):
     __tablename__ = 'LopHoc'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    ten_lop = Column(String(5))
+    ten_lop = Column(String(5), )
     so_phong = Column(String(5))
     khoi_lop = Column(Enum('Khoi10', 'Khoi11', 'Khoi12'))
     giao_vien_chu_nhiem_id = Column(ForeignKey('GiaoVien.id'))
-
+    
+    hai_hoc_ky = relationship('HocKy', secondary=lop_hoc_ky, back_populates='cac_lop_hoc', lazy='subquery')
     giao_vien_chu_nhiem = relationship('GiaoVien', back_populates='lop_chu_nhiem')
     giao_vien_day_lop = relationship('DayLop', back_populates='lop_hoc')
     hoc_sinhs = relationship('HocSinhLop', back_populates='lop_hoc', lazy=True)
@@ -175,7 +181,7 @@ class DayLop(db.Model):
 
     lop_hoc = relationship('LopHoc', back_populates='giao_vien_day_lop', lazy='subquery')
     giao_vien = relationship('GiaoVien', back_populates='lop_giao_vien_day', lazy='subquery')
-    hoc_ky = relationship('HocKy', lazy='subquery')
+    hoc_ky = relationship('HocKy', back_populates='cac_giao_vien', lazy='subquery')
     mon_hoc = relationship('MonHoc', lazy='subquery')
 
 
@@ -221,9 +227,14 @@ class MonHoc(db.Model):
 class HocKy(db.Model):
     __tablename__ = 'HocKy'
     id = Column(Integer, primary_key=True)
-
+    
+    cac_lop_hoc = relationship('LopHoc', secondary=lop_hoc_ky, back_populates='hai_hoc_ky', lazy='subquery')
+    cac_giao_vien = relationship('DayLop', back_populates='hoc_ky', lazy=True)
     bang_diem = relationship('BangDiem', back_populates='hoc_ky', lazy=True)
     thong_ke_mon_hocs = relationship('ThongKeMonHoc', back_populates='hoc_ky', lazy=True)
+    
+    def __init__(self, id):
+        self.id = id
 
 
 class BangDiem(db.Model):

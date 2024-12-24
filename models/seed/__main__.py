@@ -3,7 +3,7 @@ import hashlib
 import os
 
 from app import app, db
-from models import MonHoc, GiaoVien, QuanTri
+from models import MonHoc, GiaoVien, QuanTri, HocKy
 
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
@@ -12,6 +12,7 @@ script_dir = os.path.dirname(__file__)
 giao_vien_path = os.path.join(script_dir, 'giaovien.json')
 mon_hoc_path = os.path.join(script_dir, 'monhoc.json')
 quan_tri_path = os.path.join(script_dir, 'quantri.json')
+hoc_ky_path = os.path.join(script_dir, 'hocky.json')
 
 if __name__ == '__main__':
     print("Importing app and models in seed.py")
@@ -69,4 +70,13 @@ if __name__ == '__main__':
                     gioi_tinh=item['gioi_tinh']
                 )
                 db.session.add(quan_tri)
+            db.session.commit()
+            
+        with open(hoc_ky_path, 'r', encoding= 'utf-8') as file:
+            data = json.load(file)
+            for item in data:
+                hoc_ky = HocKy(
+                    id=item['id']
+                )
+                db.session.add(hoc_ky)
             db.session.commit()
