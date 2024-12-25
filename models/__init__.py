@@ -11,7 +11,7 @@ day_mon = db.Table('DayMon',
 )
 
 lop_hoc_ky = db.Table('LopHocKy', 
-    Column('lop_hoc_id', Integer, ForeignKey('LopHoc.id'), primary_key=True),
+    Column('lop_hoc_id', String(5), ForeignKey('LopHoc.id'), primary_key=True),
     Column('hoc_ky_id', Integer, ForeignKey('HocKy.id'), primary_key=True)
 )
 
@@ -159,7 +159,7 @@ class QuanTri(NguoiDung):
 
 class LopHoc(db.Model):
     __tablename__ = 'LopHoc'
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(5), primary_key=True)
     ten_lop = Column(String(5), )
     so_phong = Column(String(5))
     khoi_lop = Column(Enum('Khoi10', 'Khoi11', 'Khoi12'))
@@ -170,7 +170,8 @@ class LopHoc(db.Model):
     giao_vien_day_lop = relationship('DayLop', back_populates='lop_hoc')
     hoc_sinhs = relationship('HocSinhLop', back_populates='lop_hoc', lazy=True)
     
-    def __init__(self, ten_lop, so_phong, khoi_lop, giao_vien_chu_nhiem_id):
+    def __init__(self, id, ten_lop, so_phong, khoi_lop, giao_vien_chu_nhiem_id):
+        self.id = id
         self.ten_lop = ten_lop
         self.so_phong = so_phong
         self.khoi_lop = khoi_lop
@@ -208,7 +209,7 @@ class HocSinh(db.Model):
 class HocSinhLop(db.Model):
     __tablename__ = 'HocSinhLop'
     hoc_sinh_id = Column(Integer, ForeignKey('HocSinh.id'), primary_key=True)
-    lop_hoc_id = Column(Integer, ForeignKey('LopHoc.id'), primary_key=True)
+    lop_hoc_id = Column(String(5), ForeignKey('LopHoc.id'), primary_key=True)
     ngay_bat_dau = Column(Date, primary_key=True)
     ngay_ket_thuc = Column(Date)
     trang_thai = Column(Enum('DangHoc', 'DaNghiHoc', 'ChuyenTruong', 'ChuyenLop', 'HocXong'))
