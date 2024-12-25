@@ -99,18 +99,6 @@ def tao_lop_hoc():
                 lop_hoc.hai_hoc_ky.extend(HocKy.query.filter(HocKy.id > 210 + i * 10, HocKy.id < 220 + i * 10).all())
                 db.session.add(lop_hoc)
                 giao_vien_chu_nhiem_count += 1
-                
-                
-def tao_hoc_ky_lop_hoc():
-    for i in range(4):
-        minLopHoc = i * 15
-        maxLopHoc = (i + 1) * 15
-        
-        hocKys = HocKy.query.filter(HocKy.id > 210 + i * 10, HocKy.id < 220 + i * 10).all()
-        lopHocs = LopHoc.query.filter(LopHoc.id > minLopHoc, LopHoc.id <= maxLopHoc).all()
-        
-        for hocKy in hocKys:
-            hocKy.cac_lop_hoc.extend(lopHocs)
 
 
 if __name__ == '__main__':
@@ -126,7 +114,6 @@ if __name__ == '__main__':
         tao_quan_tri()
         tao_hoc_ky()
         tao_lop_hoc()
-        # tao_hoc_ky_lop_hoc()
                     
         db.session.commit()
         print('Tạo dữ liệu mẫu thành công')
