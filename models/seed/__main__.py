@@ -1,8 +1,13 @@
+from datetime import date
 import json
 import hashlib
 import os
 
+from sqlalchemy import extract
+
 from app import app, db
+from app.dao import get_khoi_lop, xep_lop
+from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
 from models import HocSinh, LopHoc, MonHoc, GiaoVien, QuanTri, HocKy
 
 # Lấy đường dẫn của thư mục hiện tại
@@ -28,6 +33,7 @@ def tao_giao_vien():
                 gioi_tinh=item['gioi_tinh']
             )
             db.session.add(giao_vien)
+        db.session.commit()
         
         
 def tao_mon_hoc():
@@ -40,6 +46,7 @@ def tao_mon_hoc():
                 ten_mon_hoc=item['ten_mon_hoc']
             )
             db.session.add(mon_hoc)
+        db.session.commit()
 
 
 def tao_quan_tri():
@@ -62,6 +69,7 @@ def tao_quan_tri():
                 gioi_tinh=item['gioi_tinh']
             )
             db.session.add(quan_tri)
+        db.session.commit()
             
             
 def tao_hoc_sinh():
@@ -90,6 +98,7 @@ def tao_hoc_sinh():
                     gioi_tinh=item['gioi_tinh']
                 )
                 db.session.add(hoc_sinh)
+            db.session.commit()
         
 
 def tao_hoc_ky():
@@ -131,6 +140,31 @@ def tao_lop_hoc():
                 lop_hoc.hai_hoc_ky.extend(HocKy.query.filter(HocKy.id > 210 + i * 10, HocKy.id < 220 + i * 10).all())
                 db.session.add(lop_hoc)
                 giao_vien_chu_nhiem_count += 1
+        db.session.commit()
+                
+                
+                
+def tao_hoc_sinh_lop():
+    
+    # Lặp qua các năm học != học kỳ
+    hocKy = 211
+    
+    # Lặp qua các khối lớp
+    for khoi_lop in [10, 11, 12]:
+        # Truy vấn các học sinh và các lớp
+        full_hoc_sinhs = HocSinh.query.filter(extract('year', HocSinh.ngay_sinh) == get_nam_sinh(hocKy, khoi_lop)).all()        
+        lop_hocs = LopHoc.query.filter(LopHoc.hai_hoc_ky.any(id=hocKy), LopHoc.khoi_lop == get_khoi_lop(khoi_lop)).all()
+        
+        so_luong_lop = len(lop_hocs)
+        
+        # Cắt danh sách học sinh thành các phần
+        si_so_tung_lop = chia_cac_phan_ngau_nhien(len(full_hoc_sinhs), so_luong_lop, 33, 40)
+        print(si_so_tung_lop)
+        index = 0
+        
+        for i in range(so_luong_lop):
+            xep_lop(lop_hoc=lop_hocs[i], hoc_sinhs=full_hoc_sinhs[index:index + si_so_tung_lop[i]])
+            index += si_so_tung_lop[i]
 
 
 if __name__ == '__main__':
@@ -141,12 +175,15 @@ if __name__ == '__main__':
         db.create_all()
                      
         # Tạo dữ liệu mẫu
-        tao_giao_vien()
-        tao_mon_hoc()
-        tao_quan_tri()
-        tao_hoc_sinh()
-        tao_hoc_ky()
-        tao_lop_hoc()
+        # tao_giao_vien()
+        # tao_mon_hoc()
+        # tao_quan_tri()
+        # tao_hoc_sinh()
+        # tao_hoc_ky()
+        # tao_lop_hoc()
+        
+        tao_hoc_sinh_lop()
+        
                     
         db.session.commit()
         print('Tạo dữ liệu mẫu thành công')

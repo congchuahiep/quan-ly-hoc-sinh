@@ -176,6 +176,7 @@ class LopHoc(db.Model):
         self.so_phong = so_phong
         self.khoi_lop = khoi_lop
         self.giao_vien_chu_nhiem_id = giao_vien_chu_nhiem_id
+    
 
 
 class DayLop(db.Model):
@@ -252,6 +253,9 @@ class HocKy(db.Model):
     
     def __init__(self, id):
         self.id = id
+        
+    def get_nam_hoc(self):
+        return self.id // 10
 
 
 class BangDiem(db.Model):
