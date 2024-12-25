@@ -3,11 +3,7 @@ import random
 
 from sqlalchemy import extract
 from app import db
-from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
-
-
-def get_khoi_lop(khoi_lop):
-    return "Khoi" + str(khoi_lop)
+from app.utils import chia_cac_phan_ngau_nhien, get_khoi_lop, get_nam_sinh
     
 
 # Hàm thêm các học sinh vào vào lớp
@@ -23,6 +19,10 @@ def them_cac_hoc_sinh_vao_lop(lop_hoc, hoc_sinhs, ngay_bat_dau=date.today()):
             trang_thai="DangHoc"
         )
         db.session.add(hoc_sinh_lop)
+        
+def tao_lop():
+    return None
+
 
 def xep_lop(hocKy, khoi_lop=10):
     from models import HocSinh, LopHoc
@@ -30,6 +30,9 @@ def xep_lop(hocKy, khoi_lop=10):
     # Truy vấn các học sinh và các lớp
     full_hoc_sinhs = HocSinh.query.filter(extract('year', HocSinh.ngay_sinh) == get_nam_sinh(hocKy, khoi_lop)).all()
     lop_hocs = LopHoc.query.filter(LopHoc.hai_hoc_ky.any(id=hocKy), LopHoc.khoi_lop == get_khoi_lop(khoi_lop)).all()
+    
+    if (len(lop_hocs) == 0):
+        lop_hocs = tao_lop()
     
     so_luong_lop = len(lop_hocs)
     

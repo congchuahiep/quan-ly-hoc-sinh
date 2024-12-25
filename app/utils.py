@@ -1,5 +1,9 @@
 import random
 
+
+def get_khoi_lop(khoi_lop):
+    return "Khoi" + str(khoi_lop)
+
 def get_nam_sinh(hocKy, khoi_lop):
     if (hocKy > 200): 
         hocKy = hocKy // 10
