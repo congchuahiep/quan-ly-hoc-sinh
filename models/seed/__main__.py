@@ -114,7 +114,7 @@ def tao_hoc_ky():
         db.session.commit()
         
         
-def tao_lop_hoc():
+def tao_lop_hoc_nam_21():
     lop_hoc_path = os.path.join(script_dir, 'lophoc.json')
     
     with open(lop_hoc_path, 'r', encoding= 'utf-8') as file:
@@ -122,27 +122,26 @@ def tao_lop_hoc():
         
         giao_vien_chu_nhiem_count = 0
         
-        for i in range(4):
-            namHoc = 21 + i
+        # Ta chỉ tạo riêng các lớp học trong năm 21, phần tạo các lớp trong kỳ khác sẽ được triển
+        # khai vào #TODO
+        namHoc = 21
+        
+        for item in data:
             
-            for item in data:
-                
-                lop_hoc = LopHoc(
-                    id=str(namHoc) + item['ten_lop'],
-                    ten_lop=item['ten_lop'],
-                    khoi_lop=item['khoi_lop'],
-                    giao_vien_chu_nhiem_id=giao_vien_chu_nhiem_count % 20 + 1
-                )
-                
-                lop_hoc.hai_hoc_ky.extend(HocKy.query.filter(HocKy.id > 210 + i * 10, HocKy.id < 220 + i * 10).all())
-                db.session.add(lop_hoc)
-                giao_vien_chu_nhiem_count += 1
+            lop_hoc = LopHoc(
+                id=str(namHoc) + item['ten_lop'],
+                ten_lop=item['ten_lop'],
+                khoi_lop=item['khoi_lop'],
+                giao_vien_chu_nhiem_id=giao_vien_chu_nhiem_count % 20 + 1
+            )
+            
+            lop_hoc.hai_hoc_ky.extend(HocKy.query.filter(HocKy.id > 210, HocKy.id < 220).all())
+            db.session.add(lop_hoc)
+            giao_vien_chu_nhiem_count += 1
         db.session.commit()
                 
                 
-                
 def tao_hoc_sinh_lop():
-    
     # Lặp qua các năm học != học kỳ
     hocKy = 211
     
@@ -166,7 +165,7 @@ if __name__ == '__main__':
         # tao_quan_tri()
         # tao_hoc_sinh()
         # tao_hoc_ky()
-        # tao_lop_hoc()
+        # tao_lop_hoc_nam_21()
         
         tao_hoc_sinh_lop()
         
