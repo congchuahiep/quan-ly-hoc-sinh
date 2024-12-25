@@ -1,11 +1,13 @@
 from datetime import date
+from enum import Enum as PyEnum
 import hashlib
 from sqlalchemy import Column, Enum, Integer, String, Float, ForeignKey, Date
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 
 from app import db
-from app.utils import get_khoi_lop
+from app.utils import get_hoc_ky
 
 day_mon = db.Table('DayMon', 
     Column('giao_vien_id', Integer, ForeignKey('GiaoVien.id'), primary_key=True),
@@ -157,13 +159,19 @@ class QuanTri(NguoiDung):
         
     def get_role(self):
         return "Quản trị"
+    
+    
+class KhoiLop(PyEnum):
+    Khoi10 = 10
+    Khoi11 = 11
+    Khoi12 = 12
 
 
 class LopHoc(db.Model):
     __tablename__ = 'LopHoc'
     id = Column(String(5), primary_key=True)
-    ten_lop = Column(String(5), )
-    khoi_lop = Column(Enum('Khoi10', 'Khoi11', 'Khoi12'))
+    ten_lop = Column(String(5))
+    khoi_lop = Column(Enum(KhoiLop))
     giao_vien_chu_nhiem_id = Column(ForeignKey('GiaoVien.id'))
     
     hai_hoc_ky = relationship('HocKy', secondary=lop_hoc_ky, back_populates='cac_lop_hoc', lazy='subquery')
@@ -188,18 +196,41 @@ class LopHoc(db.Model):
     
     def len_lop(self, ngay_bat_dau=date.today()):
         khoi_lop, loai_lop = self.tach_ten_lop()
+        nam_hoc_cu = self.hai_hoc_ky.any().get_nam_hoc()
+        nam_hoc_moi = nam_hoc_cu + 1
         
-        lop_moi = LopHoc(
-            id=self.hai_hoc_ky.any().get_nam_hoc(),
-            ten_lop= str(khoi_lop + 1) + loai_lop,
-            khoi_lop= get_khoi_lop(khoi_lop),
-            giao_vien_chu_nhiem_id=self.giao_vien_chu_nhiem_id
-        )
-        db.session.add(lop_moi)
+        if not HocKy.query.get(nam_hoc_moi * 10 + 1):
+            print("Năm học mới không có trong hệ thống")
+            return None
         
         danh_sach_hoc_sinh = self.get_danh_sach_hoc_sinh()
         
+        if khoi_lop == 12:
+            
+            for hoc_sinh in danh_sach_hoc_sinh:
+                hoc_sinh_lop.trang_thai = "HocXong"
+            
+            # TODO: thêm khả năng kết thúc cấp ba
+            return None
+        
+        ten_lop_moi = str(khoi_lop + 1) + loai_lop
+        [hoc_ky_mot_moi, hoc_ky_hai_moi] = HocKy.get_hoc_ky(nam_hoc_moi)
+        
+        lop_moi = LopHoc(
+            id=str(nam_hoc_moi) + ten_lop_moi,
+            ten_lop=ten_lop_moi,
+            khoi_lop=KhoiLop(khoi_lop),
+            giao_vien_chu_nhiem_id=self.giao_vien_chu_nhiem_id
+        )
+        lop_moi.hai_hoc_ky.extends(hoc_ky_mot_moi)
+        lop_moi.hai_hoc_ky.extends(hoc_ky_hai_moi)
+        
+        db.session.add(lop_moi)
+        
+        
         for hoc_sinh in danh_sach_hoc_sinh:
+            hoc_sinh_lop.trang_thai = "HocXong"
+            
             hoc_sinh_lop = HocSinhLop(
                 hoc_sinh_id = hoc_sinh.id,
                 lop_hoc_id = self.id,
@@ -208,7 +239,7 @@ class LopHoc(db.Model):
             )
             db.session.add(hoc_sinh_lop)
             
-        db.create_all()
+        db.session.commit()
         
         
 
@@ -288,7 +319,23 @@ class HocKy(db.Model):
     def __init__(self, id):
         self.id = id
         
-    def get_nam_hoc(self):
+    def nam_hoc_moi():
+        nam_hoc_cu = HocKy.query.order_by(HocKy.id.desc()).first().get_nam_hoc()
+        hoc_ky_mot = HocKy(id=nam_hoc_cu * 10 + 1)
+        hoc_ky_hai = HocKy(id=nam_hoc_cu * 10 + 2)
+        
+        db.session.add_all([hoc_ky_mot, hoc_ky_hai])
+        db.session.commit()
+    
+    @staticmethod
+    def get_hoc_ky(nam_hoc):
+        hoc_ky_mot = HocKy.query.get(nam_hoc * 10 + 1)
+        hoc_ky_hai = HocKy.query.get(nam_hoc * 10 + 2)
+        
+        return [hoc_ky_mot, hoc_ky_hai]
+        
+    @hybrid_property
+    def nam_hoc(self):
         return self.id // 10
 
 

@@ -1,12 +1,13 @@
 import random
 
 
-def get_khoi_lop(khoi_lop):
-    return "Khoi" + str(khoi_lop)
+def get_nam_hoc(hoc_ky):
+    return hoc_ky // 10
 
-def get_nam_sinh(hocKy, khoi_lop):
-    if (hocKy > 200): 
-        hocKy = hocKy // 10
+def get_hoc_ky(nam_hoc):
+    return (nam_hoc * 10 + 1, nam_hoc * 10 + 2)
+
+def get_nam_sinh(nam_hoc, khoi_lop):
     
     mapping = {
         21: {10: 2006, 11: 2005, 12: 2004},
@@ -14,7 +15,7 @@ def get_nam_sinh(hocKy, khoi_lop):
         23: {10: 2008, 11: 2007, 12: 2006},
         24: {10: 2009, 11: 2008, 12: 2007}
     }
-    return mapping.get(hocKy, {}).get(khoi_lop)
+    return mapping.get(nam_hoc, {}).get(khoi_lop)
 
 def chia_cac_phan_ngau_nhien(tong, so_phan, min_val, max_val):
     """

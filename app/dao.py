@@ -3,7 +3,7 @@ import random
 
 from sqlalchemy import extract
 from app import db
-from app.utils import chia_cac_phan_ngau_nhien, get_khoi_lop, get_nam_sinh
+from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
     
 
 # Hàm thêm các học sinh vào vào lớp
@@ -24,15 +24,19 @@ def tao_lop():
     return None
 
 
-def xep_lop(hocKy, khoi_lop=10):
-    from models import HocSinh, LopHoc
+def xep_lop(nam_hoc, khoi_lop=10):
+    from models import HocSinh, LopHoc, KhoiLop, HocKy
     
     # Truy vấn các học sinh và các lớp
-    full_hoc_sinhs = HocSinh.query.filter(extract('year', HocSinh.ngay_sinh) == get_nam_sinh(hocKy, khoi_lop)).all()
-    lop_hocs = LopHoc.query.filter(LopHoc.hai_hoc_ky.any(id=hocKy), LopHoc.khoi_lop == get_khoi_lop(khoi_lop)).all()
+    full_hoc_sinhs = HocSinh.query.filter(extract('year', HocSinh.ngay_sinh) == get_nam_sinh(nam_hoc, khoi_lop)).all()
+    lop_hocs = LopHoc.query.filter(LopHoc.hai_hoc_ky.any(HocKy.nam_hoc == nam_hoc), LopHoc.khoi_lop == KhoiLop(khoi_lop)).all()
     
     if (len(lop_hocs) == 0):
         lop_hocs = tao_lop()
+        
+        print("Không có lớp?", lop_hocs)
+        
+        return
     
     so_luong_lop = len(lop_hocs)
     

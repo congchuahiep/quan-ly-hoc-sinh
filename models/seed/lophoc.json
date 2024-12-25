@@ -1,77 +1,77 @@
 [
    {
       "ten_lop": "12A",
-      "khoi_lop": "Khoi12",
+      "khoi_lop": 12,
       "giao_vien_chu_nhiem_id": 1
    },
    {
       "ten_lop": "12B",
-      "khoi_lop": "Khoi12",
+      "khoi_lop": 12,
       "giao_vien_chu_nhiem_id": 2
    },
    {
       "ten_lop": "12C",
-      "khoi_lop": "Khoi12",
+      "khoi_lop": 12,
       "giao_vien_chu_nhiem_id": 3
    },
    {
       "ten_lop": "12D",
-      "khoi_lop": "Khoi12",
+      "khoi_lop": 12,
       "giao_vien_chu_nhiem_id": 4
    },
    {
       "ten_lop": "12E",
-      "khoi_lop": "Khoi12",
+      "khoi_lop": 12,
       "giao_vien_chu_nhiem_id": 5
    },
    {
       "ten_lop": "11A",
-      "khoi_lop": "Khoi11",
+      "khoi_lop": 11,
       "giao_vien_chu_nhiem_id": 6
    },
    {
       "ten_lop": "11B",
-      "khoi_lop": "Khoi11",
+      "khoi_lop": 11,
       "giao_vien_chu_nhiem_id": 7
    },
    {
       "ten_lop": "11C",
-      "khoi_lop": "Khoi11",
+      "khoi_lop": 11,
       "giao_vien_chu_nhiem_id": 8
    },
    {
       "ten_lop": "11D",
-      "khoi_lop": "Khoi11",
+      "khoi_lop": 11,
       "giao_vien_chu_nhiem_id": 9
    },
    {
       "ten_lop": "11E",
-      "khoi_lop": "Khoi11",
+      "khoi_lop": 11,
       "giao_vien_chu_nhiem_id": 10
    },
    {
       "ten_lop": "10A",
-      "khoi_lop": "Khoi10",
+      "khoi_lop": 10,
       "giao_vien_chu_nhiem_id": 11
    },
    {
       "ten_lop": "10B",
-      "khoi_lop": "Khoi10",
+      "khoi_lop": 10,
       "giao_vien_chu_nhiem_id": 12
    },
    {
       "ten_lop": "10C",
-      "khoi_lop": "Khoi10",
+      "khoi_lop": 10,
       "giao_vien_chu_nhiem_id": 13
    },
    {
       "ten_lop": "10D",
-      "khoi_lop": "Khoi10",
+      "khoi_lop": 10,
       "giao_vien_chu_nhiem_id": 14
    },
    {
       "ten_lop": "10E",
-      "khoi_lop": "Khoi10",
+      "khoi_lop": 10,
       "giao_vien_chu_nhiem_id": 15
    }
 ]

@@ -6,9 +6,9 @@ import os
 from sqlalchemy import extract
 
 from app import app, db
-from app.dao import get_khoi_lop, xep_lop
+from app.dao import xep_lop
 from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
-from models import HocSinh, LopHoc, MonHoc, GiaoVien, QuanTri, HocKy
+from models import HocSinh, LopHoc, MonHoc, GiaoVien, QuanTri, HocKy, KhoiLop
 
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
@@ -131,25 +131,31 @@ def tao_lop_hoc_nam_21():
             lop_hoc = LopHoc(
                 id=str(namHoc) + item['ten_lop'],
                 ten_lop=item['ten_lop'],
-                khoi_lop=item['khoi_lop'],
+                khoi_lop=KhoiLop(item['khoi_lop']),
                 giao_vien_chu_nhiem_id=giao_vien_chu_nhiem_count % 20 + 1
             )
-            
             lop_hoc.hai_hoc_ky.extend(HocKy.query.filter(HocKy.id > 210, HocKy.id < 220).all())
             db.session.add(lop_hoc)
             giao_vien_chu_nhiem_count += 1
         db.session.commit()
                 
                 
-def tao_hoc_sinh_lop():
+def tao_hoc_sinh_lop_nam_21():
     # Lặp qua các năm học != học kỳ
-    hocKy = 211
+    nam_hoc = 21
     
     # Lặp qua các khối lớp
     for khoi_lop in [10, 11, 12]:
-        xep_lop(hocKy, khoi_lop)
+        xep_lop(nam_hoc, khoi_lop)
             
+            
+def tao_lop_hoc_va_hoc_sinh_lop_con_lai():
+    hoc_ky = 21
     
+    for khoi_lop in [10, 11, 12]:
+        LopHoc 
+        
+
 
 
 if __name__ == '__main__':
@@ -167,7 +173,7 @@ if __name__ == '__main__':
         # tao_hoc_ky()
         # tao_lop_hoc_nam_21()
         
-        tao_hoc_sinh_lop()
+        tao_hoc_sinh_lop_nam_21()
         
                     
         db.session.commit()
