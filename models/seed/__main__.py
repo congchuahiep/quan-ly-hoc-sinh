@@ -6,7 +6,7 @@ import os
 from sqlalchemy import extract
 
 from app import app, db
-from app.dao import giao_vien_khong_chu_nhiem, tao_khoi_10_moi, xep_lop
+from app.dao import giao_vien_khong_chu_nhiem, phan_cong_ngau_nhien_giao_vien_day_hoc, tao_khoi_10_moi, xep_lop
 from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
 from models import HocSinh, LopHoc, MonHoc, GiaoVien, QuanTri, HocKy, KhoiLop
 
@@ -166,6 +166,21 @@ def tao_lop_hoc_va_hoc_sinh_lop_con_lai():
         # Thêm các học sinh năm mới
         xep_lop(nam_hoc_moi)
             
+def phan_mon_giao_vien():
+    day_mon_path = os.path.join(script_dir, 'daymon.json')
+    
+    with open(day_mon_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        for item in data:
+            mon_hoc = MonHoc.query.get(item['mon_hoc_id'])
+            giao_vien = GiaoVien.query.get(item['giao_vien_id'])
+            
+            giao_vien.day_mon.append(mon_hoc)
+        db.session.commit()
+        
+
+def phan_lop_giao_vien():
+    phan_cong_ngau_nhien_giao_vien_day_hoc(21)
         
 
 if __name__ == '__main__':
@@ -175,28 +190,32 @@ if __name__ == '__main__':
         
         db.create_all()
                      
-        ### Tạo dữ liệu basic
+        # ### Tạo dữ liệu basic
         
-        tao_giao_vien()
-        tao_mon_hoc()
-        tao_quan_tri()
-        tao_hoc_sinh()
-        tao_hoc_ky()
+        # tao_giao_vien()
+        # tao_mon_hoc()
+        # tao_quan_tri()
+        # tao_hoc_sinh()
+        # tao_hoc_ky()
         
-        ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
+        # ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
         
-        tao_lop_hoc_nam_21()
-        tao_hoc_sinh_lop_nam_21()
+        # tao_lop_hoc_nam_21()
+        # tao_hoc_sinh_lop_nam_21()
         
-        ### Tạo học kỳ mới: 22, 23, 24 
+        # ### Tạo học kỳ mới: 22, 23, 24 
         
-        HocKy.nam_hoc_moi()
-        HocKy.nam_hoc_moi()
-        HocKy.nam_hoc_moi()
+        # HocKy.nam_hoc_moi()
+        # HocKy.nam_hoc_moi()
+        # HocKy.nam_hoc_moi()
         
-        ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
+        # ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
 
-        tao_lop_hoc_va_hoc_sinh_lop_con_lai()
-                    
+        # tao_lop_hoc_va_hoc_sinh_lop_con_lai()
+        
+        ### Phân môn giáo viên dạy
+        phan_mon_giao_vien()
+        phan_lop_giao_vien()
+        
         db.session.commit()
         print('Tạo dữ liệu mẫu thành công')

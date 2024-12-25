@@ -3,7 +3,7 @@ import random
 
 from sqlalchemy import exists, extract
 from app import db
-from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
+from app.utils import chia_cac_phan_ngau_nhien, get_hoc_ky, get_nam_sinh
     
 
 # Hàm thêm các học sinh vào vào lớp
@@ -74,3 +74,73 @@ def tao_khoi_10_moi(nam_hoc, so_luong=5):
         
         db.session.add(lop_hoc)
     db.session.commit()
+
+def phan_cong_ngau_nhien_giao_vien_day_hoc(nam_hoc):
+    from models import LopHoc, GiaoVien, MonHoc, DayLop
+    
+    so_mon_hoc = MonHoc.query.count()
+    lop_hocs = LopHoc.query.filter(LopHoc.nam_hoc == nam_hoc).all()
+    
+    (hoc_ky_mot, hoc_ky_hai) = get_hoc_ky(nam_hoc)
+
+    #1. Phân công giáo viên chủ nhiệm
+    for i in range(len(lop_hocs)):
+        lop = lop_hocs[i]
+        giao_vien_chu_nhiem = GiaoVien.query.get(lop.giao_vien_chu_nhiem_id)
+        
+        # Chọn môn học ngẫu nhiên mà giáo viên chủ nhiệm dạy
+        mon_hoc = random.choice(giao_vien_chu_nhiem.day_mon)
+        
+        day_lop_ky_mot = DayLop(
+            lop_hoc_id = lop.id,
+            giao_vien_id = lop.giao_vien_chu_nhiem_id,
+            mon_hoc_id = mon_hoc.id,
+            hoc_ky_id = hoc_ky_mot
+        )
+        
+        day_lop_ky_hai = DayLop(
+            lop_hoc_id = lop.id,
+            giao_vien_id = lop.giao_vien_chu_nhiem_id,
+            mon_hoc_id = mon_hoc.id,
+            hoc_ky_id = hoc_ky_hai
+        )
+        
+        db.session.add_all([day_lop_ky_mot, day_lop_ky_hai])
+        db.session.commit()
+        
+    #2. Phân công thêm các giáo viên và môn học còn lại
+    for lop in lop_hocs:
+        # Lấy danh sách các giáo viên trừ giáo viên đã dạy
+        giao_vien_da_phan_cong_id = {gv.id for gv in lop.giao_vien_day_lop}
+        # Lấy danh sách các môn học đã có
+        mon_hoc_da_co_id = {gv_lh.mon_hoc_id for gv_lh in lop.giao_vien_day_lop}
+        
+        while len(mon_hoc_da_co_id) < so_mon_hoc:
+            # Lọc môn học còn thiếu
+            mon_hoc_con_thieu = MonHoc.query.filter(~MonHoc.id.in_(mon_hoc_da_co_id)).first()
+            
+            # Lọc danh sách các giáo viên dạy môn học còn thiếu
+            giao_viens = GiaoVien.query.filter(GiaoVien.day_mon.any(MonHoc.id == mon_hoc_con_thieu.id)).all()
+            # Lọc danh sách các giáo viên đã dạy lớp này
+            giao_viens = GiaoVien.query.filter(~GiaoVien.id.in_(giao_vien_da_phan_cong_id)).all()
+            giao_vien = random.choice(giao_viens)
+            
+            day_lop_ky_mot = DayLop(
+                lop_hoc_id = lop.id,
+                giao_vien_id = giao_vien.id,
+                mon_hoc_id = mon_hoc_con_thieu.id,
+                hoc_ky_id = hoc_ky_mot
+            )
+            
+            day_lop_ky_hai = DayLop(
+                lop_hoc_id = lop.id,
+                giao_vien_id = giao_vien.id,
+                mon_hoc_id = mon_hoc_con_thieu.id,
+                hoc_ky_id = hoc_ky_hai
+            )
+            
+            db.session.add_all([day_lop_ky_mot, day_lop_ky_hai])
+            
+            giao_vien_da_phan_cong_id.add(giao_vien.id)
+            mon_hoc_da_co_id.add(mon_hoc_con_thieu.id)
+        db.session.commit()
