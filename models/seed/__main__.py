@@ -151,20 +151,9 @@ def tao_hoc_sinh_lop():
     
     # Lặp qua các khối lớp
     for khoi_lop in [10, 11, 12]:
-        # Truy vấn các học sinh và các lớp
-        full_hoc_sinhs = HocSinh.query.filter(extract('year', HocSinh.ngay_sinh) == get_nam_sinh(hocKy, khoi_lop)).all()        
-        lop_hocs = LopHoc.query.filter(LopHoc.hai_hoc_ky.any(id=hocKy), LopHoc.khoi_lop == get_khoi_lop(khoi_lop)).all()
-        
-        so_luong_lop = len(lop_hocs)
-        
-        # Cắt danh sách học sinh thành các phần
-        si_so_tung_lop = chia_cac_phan_ngau_nhien(len(full_hoc_sinhs), so_luong_lop, 33, 40)
-        print(si_so_tung_lop)
-        index = 0
-        
-        for i in range(so_luong_lop):
-            xep_lop(lop_hoc=lop_hocs[i], hoc_sinhs=full_hoc_sinhs[index:index + si_so_tung_lop[i]])
-            index += si_so_tung_lop[i]
+        xep_lop(hocKy, khoi_lop)
+            
+    
 
 
 if __name__ == '__main__':
