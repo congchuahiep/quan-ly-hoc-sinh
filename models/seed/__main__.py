@@ -123,14 +123,12 @@ def tao_lop_hoc():
         giao_vien_chu_nhiem_count = 0
         
         for i in range(4):
-            
-            hocKy = 21 + i
-            
+            namHoc = 21 + i
             
             for item in data:
                 
                 lop_hoc = LopHoc(
-                    id=str(hocKy) + item['ten_lop'],
+                    id=str(namHoc) + item['ten_lop'],
                     ten_lop=item['ten_lop'],
                     so_phong=item['so_phong'],
                     khoi_lop=item['khoi_lop'],
