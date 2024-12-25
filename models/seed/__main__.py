@@ -6,7 +6,7 @@ import os
 from sqlalchemy import extract
 
 from app import app, db
-from app.dao import xep_lop
+from app.dao import giao_vien_khong_chu_nhiem, tao_khoi_10_moi, xep_lop
 from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
 from models import HocSinh, LopHoc, MonHoc, GiaoVien, QuanTri, HocKy, KhoiLop
 
@@ -130,6 +130,7 @@ def tao_lop_hoc_nam_21():
             
             lop_hoc = LopHoc(
                 id=str(namHoc) + item['ten_lop'],
+                nam_hoc=21,
                 ten_lop=item['ten_lop'],
                 khoi_lop=KhoiLop(item['khoi_lop']),
                 giao_vien_chu_nhiem_id=giao_vien_chu_nhiem_count % 20 + 1
@@ -150,13 +151,22 @@ def tao_hoc_sinh_lop_nam_21():
             
             
 def tao_lop_hoc_va_hoc_sinh_lop_con_lai():
-    hoc_ky = 21
-    
-    for khoi_lop in [10, 11, 12]:
-        LopHoc 
+    for nam_hoc_moi in [22, 23, 24]:
+        nam_hoc_cu = nam_hoc_moi - 1
+        lop_hocs = LopHoc.query.filter(LopHoc.nam_hoc == nam_hoc_cu).all()
         
-
-
+        print(lop_hocs)
+        
+        for lop_hoc in lop_hocs:
+            lop_hoc.len_lop()
+            
+        # Tạo lớp 10 mới
+        tao_khoi_10_moi(nam_hoc_moi)
+        
+        # Thêm các học sinh năm mới
+        xep_lop(nam_hoc_moi)
+            
+        
 
 if __name__ == '__main__':
     
@@ -165,16 +175,28 @@ if __name__ == '__main__':
         
         db.create_all()
                      
-        # Tạo dữ liệu mẫu
-        # tao_giao_vien()
-        # tao_mon_hoc()
-        # tao_quan_tri()
-        # tao_hoc_sinh()
-        # tao_hoc_ky()
-        # tao_lop_hoc_nam_21()
+        ### Tạo dữ liệu basic
         
+        tao_giao_vien()
+        tao_mon_hoc()
+        tao_quan_tri()
+        tao_hoc_sinh()
+        tao_hoc_ky()
+        
+        ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
+        
+        tao_lop_hoc_nam_21()
         tao_hoc_sinh_lop_nam_21()
         
+        ### Tạo học kỳ mới: 22, 23, 24 
+        
+        HocKy.nam_hoc_moi()
+        HocKy.nam_hoc_moi()
+        HocKy.nam_hoc_moi()
+        
+        ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
+
+        tao_lop_hoc_va_hoc_sinh_lop_con_lai()
                     
         db.session.commit()
         print('Tạo dữ liệu mẫu thành công')

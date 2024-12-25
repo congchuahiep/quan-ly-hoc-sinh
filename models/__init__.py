@@ -170,6 +170,7 @@ class KhoiLop(PyEnum):
 class LopHoc(db.Model):
     __tablename__ = 'LopHoc'
     id = Column(String(5), primary_key=True)
+    nam_hoc = Column(Integer)
     ten_lop = Column(String(5))
     khoi_lop = Column(Enum(KhoiLop))
     giao_vien_chu_nhiem_id = Column(ForeignKey('GiaoVien.id'))
@@ -179,9 +180,10 @@ class LopHoc(db.Model):
     giao_vien_day_lop = relationship('DayLop', back_populates='lop_hoc')
     hoc_sinhs = relationship('HocSinhLop', back_populates='lop_hoc', lazy=True)
     
-    def __init__(self, id, ten_lop, khoi_lop, giao_vien_chu_nhiem_id):
+    def __init__(self, id, ten_lop, nam_hoc, khoi_lop, giao_vien_chu_nhiem_id):
         self.id = id
         self.ten_lop = ten_lop
+        self.nam_hoc = nam_hoc
         self.khoi_lop = khoi_lop
         self.giao_vien_chu_nhiem_id = giao_vien_chu_nhiem_id
         
@@ -190,13 +192,13 @@ class LopHoc(db.Model):
         phan_chu = ''.join(filter(str.isalpha, self.ten_lop))  # Lấy phần chữ
         
         return (phan_so, phan_chu)
-    
+     
     def get_danh_sach_hoc_sinh(self, trang_thai="DangHoc"):
-        return HocSinh.query.join(HocSinhLop).filter(HocSinhLop.lop_hoc_id == self.id, HocSinhLop.trang_thai == trang_thai).all()
+        return HocSinhLop.query.filter(HocSinhLop.lop_hoc_id == self.id, HocSinhLop.trang_thai == trang_thai).all()
     
     def len_lop(self, ngay_bat_dau=date.today()):
         khoi_lop, loai_lop = self.tach_ten_lop()
-        nam_hoc_cu = self.hai_hoc_ky.any().get_nam_hoc()
+        nam_hoc_cu = self.nam_hoc
         nam_hoc_moi = nam_hoc_cu + 1
         
         if not HocKy.query.get(nam_hoc_moi * 10 + 1):
@@ -207,33 +209,38 @@ class LopHoc(db.Model):
         
         if khoi_lop == 12:
             
-            for hoc_sinh in danh_sach_hoc_sinh:
+            for hoc_sinh_lop in danh_sach_hoc_sinh:
                 hoc_sinh_lop.trang_thai = "HocXong"
             
             # TODO: thêm khả năng kết thúc cấp ba
             return None
         
         ten_lop_moi = str(khoi_lop + 1) + loai_lop
-        [hoc_ky_mot_moi, hoc_ky_hai_moi] = HocKy.get_hoc_ky(nam_hoc_moi)
+        (hoc_ky_mot_moi, hoc_ky_hai_moi) = HocKy.get_hoc_ky(nam_hoc_moi)
+        
+        print(self.id, " -> ", str(nam_hoc_moi) + ten_lop_moi)
         
         lop_moi = LopHoc(
             id=str(nam_hoc_moi) + ten_lop_moi,
+            nam_hoc=nam_hoc_moi,
             ten_lop=ten_lop_moi,
             khoi_lop=KhoiLop(khoi_lop),
             giao_vien_chu_nhiem_id=self.giao_vien_chu_nhiem_id
         )
-        lop_moi.hai_hoc_ky.extends(hoc_ky_mot_moi)
-        lop_moi.hai_hoc_ky.extends(hoc_ky_hai_moi)
+        lop_moi.hai_hoc_ky.append(hoc_ky_mot_moi)
+        lop_moi.hai_hoc_ky.append(hoc_ky_hai_moi)
         
         db.session.add(lop_moi)
         
         
-        for hoc_sinh in danh_sach_hoc_sinh:
+        for hoc_sinh_lop in danh_sach_hoc_sinh:
             hoc_sinh_lop.trang_thai = "HocXong"
+            
+            hoc_sinh = HocSinh.query.get(hoc_sinh_lop.hoc_sinh_id)
             
             hoc_sinh_lop = HocSinhLop(
                 hoc_sinh_id = hoc_sinh.id,
-                lop_hoc_id = self.id,
+                lop_hoc_id = lop_moi.id,
                 ngay_bat_dau = ngay_bat_dau,
                 trang_thai = "DangHoc"
             )
@@ -319,10 +326,12 @@ class HocKy(db.Model):
     def __init__(self, id):
         self.id = id
         
+    @staticmethod
     def nam_hoc_moi():
-        nam_hoc_cu = HocKy.query.order_by(HocKy.id.desc()).first().get_nam_hoc()
-        hoc_ky_mot = HocKy(id=nam_hoc_cu * 10 + 1)
-        hoc_ky_hai = HocKy(id=nam_hoc_cu * 10 + 2)
+        nam_hoc_cu = HocKy.query.order_by(HocKy.id.desc()).first().nam_hoc
+        nam_hoc_moi = nam_hoc_cu + 1
+        hoc_ky_mot = HocKy(id=nam_hoc_moi * 10 + 1)
+        hoc_ky_hai = HocKy(id=nam_hoc_moi * 10 + 2)
         
         db.session.add_all([hoc_ky_mot, hoc_ky_hai])
         db.session.commit()
@@ -332,8 +341,8 @@ class HocKy(db.Model):
         hoc_ky_mot = HocKy.query.get(nam_hoc * 10 + 1)
         hoc_ky_hai = HocKy.query.get(nam_hoc * 10 + 2)
         
-        return [hoc_ky_mot, hoc_ky_hai]
-        
+        return (hoc_ky_mot, hoc_ky_hai)
+    
     @hybrid_property
     def nam_hoc(self):
         return self.id // 10
