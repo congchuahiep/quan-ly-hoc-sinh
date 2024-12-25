@@ -3,7 +3,7 @@ import hashlib
 import os
 
 from app import app, db
-from models import MonHoc, GiaoVien, QuanTri, HocKy
+from models import LopHoc, MonHoc, GiaoVien, QuanTri, HocKy, lop_hoc_ky
 
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
@@ -13,70 +13,120 @@ giao_vien_path = os.path.join(script_dir, 'giaovien.json')
 mon_hoc_path = os.path.join(script_dir, 'monhoc.json')
 quan_tri_path = os.path.join(script_dir, 'quantri.json')
 hoc_ky_path = os.path.join(script_dir, 'hocky.json')
+lop_hoc_path = os.path.join(script_dir, 'lophoc.json')
+
+def tao_giao_vien():
+    with open(giao_vien_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        for item in data:
+            giao_vien = GiaoVien(
+                username=item['username'],
+                password=item['password'],
+                avatar=item['avatar'],
+                ten=item['ten'],
+                ho=item['ho'],
+                ngay_sinh=item['ngay_sinh'],
+                email=item['email'],
+                dien_thoai=item['dien_thoai'],
+                dia_chi=item['dia_chi'],
+                loai_nguoi_dung=item['loai_nguoi_dung'],
+                gioi_tinh=item['gioi_tinh']
+            )
+            db.session.add(giao_vien)
+        
+        
+def tao_mon_hoc():
+    with open(mon_hoc_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        for item in data:
+            mon_hoc = MonHoc(
+                ten_mon_hoc=item['ten_mon_hoc']
+            )
+            db.session.add(mon_hoc)
+
+
+def tao_quan_tri():
+    with open(quan_tri_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        for item in data:
+            quan_tri = QuanTri(
+                username=item['username'],
+                password=item['password'],
+                avatar=item['avatar'],
+                ten=item['ten'],
+                ho=item['ho'],
+                ngay_sinh=item['ngay_sinh'],
+                email=item['email'],
+                dien_thoai=item['dien_thoai'],
+                dia_chi=item['dia_chi'],
+                loai_nguoi_dung=item['loai_nguoi_dung'],
+                gioi_tinh=item['gioi_tinh']
+            )
+            db.session.add(quan_tri)
+        
+
+def tao_hoc_ky():
+    with open(hoc_ky_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        for item in data:
+            hoc_ky = HocKy(
+                id=item['id']
+            )
+            db.session.add(hoc_ky)
+        db.session.commit()
+        
+def tao_lop_hoc():
+    with open(lop_hoc_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        
+        giao_vien_chu_nhiem_count = 0
+        
+        for i in range(4):
+            
+            hocKy = 21 + i
+            
+            
+            for item in data:
+                
+                lop_hoc = LopHoc(
+                    id=str(hocKy) + item['ten_lop'],
+                    ten_lop=item['ten_lop'],
+                    so_phong=item['so_phong'],
+                    khoi_lop=item['khoi_lop'],
+                    giao_vien_chu_nhiem_id=giao_vien_chu_nhiem_count % 20 + 1
+                )
+                
+                lop_hoc.hai_hoc_ky.extend(HocKy.query.filter(HocKy.id > 210 + i * 10, HocKy.id < 220 + i * 10).all())
+                db.session.add(lop_hoc)
+                giao_vien_chu_nhiem_count += 1
+                
+                
+def tao_hoc_ky_lop_hoc():
+    for i in range(4):
+        minLopHoc = i * 15
+        maxLopHoc = (i + 1) * 15
+        
+        hocKys = HocKy.query.filter(HocKy.id > 210 + i * 10, HocKy.id < 220 + i * 10).all()
+        lopHocs = LopHoc.query.filter(LopHoc.id > minLopHoc, LopHoc.id <= maxLopHoc).all()
+        
+        for hocKy in hocKys:
+            hocKy.cac_lop_hoc.extend(lopHocs)
+
 
 if __name__ == '__main__':
-    print("Importing app and models in seed.py")
-
-    print("Imported successfully!")
     
     with app.app_context():
-        db.create_all()
-
-        # Tạo GiaoVien
-        with open(giao_vien_path, 'r', encoding= 'utf-8') as file:
-            data = json.load(file)
-            for item in data:
-                giao_vien = GiaoVien(
-                    username=item['username'],
-                    password=item['password'],
-                    avatar=item['avatar'],
-                    ten=item['ten'],
-                    ho=item['ho'],
-                    ngay_sinh=item['ngay_sinh'],
-                    email=item['email'],
-                    dien_thoai=item['dien_thoai'],
-                    dia_chi=item['dia_chi'],
-                    loai_nguoi_dung=item['loai_nguoi_dung'],
-                    gioi_tinh=item['gioi_tinh']
-                )
-                db.session.add(giao_vien)
-            db.session.commit()
+        print('Tạo dữ liệu mẫu...')
         
-        # Tạo MonHoc
-        with open(mon_hoc_path, 'r', encoding= 'utf-8') as file:
-            data = json.load(file)
-            for item in data:
-                mon_hoc = MonHoc(
-                    ten_mon_hoc=item['ten_mon_hoc']
-                )
-                db.session.add(mon_hoc)
-            db.session.commit()
-            
-        # Tạo QuanTri
-        with open(quan_tri_path, 'r', encoding= 'utf-8') as file:
-            data = json.load(file)
-            for item in data:
-                quan_tri = QuanTri(
-                    username=item['username'],
-                    password=item['password'],
-                    avatar=item['avatar'],
-                    ten=item['ten'],
-                    ho=item['ho'],
-                    ngay_sinh=item['ngay_sinh'],
-                    email=item['email'],
-                    dien_thoai=item['dien_thoai'],
-                    dia_chi=item['dia_chi'],
-                    loai_nguoi_dung=item['loai_nguoi_dung'],
-                    gioi_tinh=item['gioi_tinh']
-                )
-                db.session.add(quan_tri)
-            db.session.commit()
-            
-        with open(hoc_ky_path, 'r', encoding= 'utf-8') as file:
-            data = json.load(file)
-            for item in data:
-                hoc_ky = HocKy(
-                    id=item['id']
-                )
-                db.session.add(hoc_ky)
-            db.session.commit()
+        db.create_all()
+                     
+        # Tạo dữ liệu mẫu
+        tao_giao_vien()
+        tao_mon_hoc()
+        tao_quan_tri()
+        tao_hoc_ky()
+        tao_lop_hoc()
+        # tao_hoc_ky_lop_hoc()
+                    
+        db.session.commit()
+        print('Tạo dữ liệu mẫu thành công')
