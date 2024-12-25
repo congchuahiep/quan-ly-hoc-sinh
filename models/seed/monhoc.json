@@ -3,24 +3,9 @@
       "ten_mon_hoc": "Toán"
    },
    {
-		"ten_mon_hoc": "Vật Lý"
-	},
-	{
-		"ten_mon_hoc": "Hoá Học"
-	},
-	{
-		"ten_mon_hoc": "Sinh Học"
-	},
-	{
-		"ten_mon_hoc": "Ngữ Văn"
-	},
-	{
-		"ten_mon_hoc": "Lịch Sử"
-	},
-	{
-		"ten_mon_hoc": "Địa Lý"
-	},
-	{
-		"ten_mon_hoc": "Giáo dục công dân"
+      "ten_mon_hoc": "Ngữ Văn"
+   },
+   {
+      "ten_mon_hoc": "Tiếng Anh"
    }
 ]
