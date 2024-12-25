@@ -3,19 +3,14 @@ import hashlib
 import os
 
 from app import app, db
-from models import LopHoc, MonHoc, GiaoVien, QuanTri, HocKy, lop_hoc_ky
+from models import HocSinh, LopHoc, MonHoc, GiaoVien, QuanTri, HocKy
 
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
 
-# Khởi tạo đường dẫn tuyệt đối cho các tệp json
-giao_vien_path = os.path.join(script_dir, 'giaovien.json')
-mon_hoc_path = os.path.join(script_dir, 'monhoc.json')
-quan_tri_path = os.path.join(script_dir, 'quantri.json')
-hoc_ky_path = os.path.join(script_dir, 'hocky.json')
-lop_hoc_path = os.path.join(script_dir, 'lophoc.json')
-
 def tao_giao_vien():
+    giao_vien_path = os.path.join(script_dir, 'giaovien.json')
+    
     with open(giao_vien_path, 'r', encoding= 'utf-8') as file:
         data = json.load(file)
         for item in data:
@@ -36,6 +31,8 @@ def tao_giao_vien():
         
         
 def tao_mon_hoc():
+    mon_hoc_path = os.path.join(script_dir, 'monhoc.json')
+    
     with open(mon_hoc_path, 'r', encoding= 'utf-8') as file:
         data = json.load(file)
         for item in data:
@@ -46,6 +43,8 @@ def tao_mon_hoc():
 
 
 def tao_quan_tri():
+    quan_tri_path = os.path.join(script_dir, 'quantri.json')
+    
     with open(quan_tri_path, 'r', encoding= 'utf-8') as file:
         data = json.load(file)
         for item in data:
@@ -63,9 +62,39 @@ def tao_quan_tri():
                 gioi_tinh=item['gioi_tinh']
             )
             db.session.add(quan_tri)
+            
+            
+def tao_hoc_sinh():
+    hoc_sinh_file_paths = [
+        "hocsinh2004.json",
+        "hocsinh2005.json",
+        "hocsinh2006.json",
+        "hocsinh2007.json",
+        "hocsinh2008.json",
+        "hocsinh2009.json"
+    ]
+    
+    for hoc_sinh_file_path in hoc_sinh_file_paths:
+        hoc_sinh_path = os.path.join(script_dir, hoc_sinh_file_path)
+        
+        with open(hoc_sinh_path, 'r', encoding= 'utf-8') as file:
+            data = json.load(file)
+            for item in data:
+                hoc_sinh = HocSinh(
+                    ten=item['ten'],
+                    ho=item['ho'],
+                    ngay_sinh=item['ngay_sinh'],
+                    email=item['email'],
+                    dien_thoai=item['dien_thoai'],
+                    dia_chi=item['dia_chi'],
+                    gioi_tinh=item['gioi_tinh']
+                )
+                db.session.add(hoc_sinh)
         
 
 def tao_hoc_ky():
+    hoc_ky_path = os.path.join(script_dir, 'hocky.json')
+    
     with open(hoc_ky_path, 'r', encoding= 'utf-8') as file:
         data = json.load(file)
         for item in data:
@@ -75,7 +104,10 @@ def tao_hoc_ky():
             db.session.add(hoc_ky)
         db.session.commit()
         
+        
 def tao_lop_hoc():
+    lop_hoc_path = os.path.join(script_dir, 'lophoc.json')
+    
     with open(lop_hoc_path, 'r', encoding= 'utf-8') as file:
         data = json.load(file)
         
@@ -112,6 +144,7 @@ if __name__ == '__main__':
         tao_giao_vien()
         tao_mon_hoc()
         tao_quan_tri()
+        tao_hoc_sinh()
         tao_hoc_ky()
         tao_lop_hoc()
                     

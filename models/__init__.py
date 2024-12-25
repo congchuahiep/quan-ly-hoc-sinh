@@ -196,6 +196,7 @@ class HocSinh(db.Model):
     __tablename__ = 'HocSinh'
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten = Column(String(50))
+    ho = Column(String(120))
     ngay_sinh = Column(Date)
     email = Column(String(50))
     dien_thoai = Column(String(15))
@@ -204,6 +205,15 @@ class HocSinh(db.Model):
     
     lich_su_lop_hoc = relationship('HocSinhLop', back_populates='hoc_sinh', lazy=True)
     bang_diems = relationship('BangDiem', back_populates='hoc_sinh', lazy=True)
+    
+    def __init__(self, ten, ho, ngay_sinh, email, dien_thoai, dia_chi, gioi_tinh):
+        self.ten = ten
+        self.ho = ho
+        self.ngay_sinh = ngay_sinh
+        self.email = email
+        self.dien_thoai = dien_thoai
+        self.dia_chi = dia_chi
+        self.gioi_tinh = gioi_tinh
 
 
 class HocSinhLop(db.Model):
