@@ -130,7 +130,6 @@ def tao_lop_hoc():
                 lop_hoc = LopHoc(
                     id=str(namHoc) + item['ten_lop'],
                     ten_lop=item['ten_lop'],
-                    so_phong=item['so_phong'],
                     khoi_lop=item['khoi_lop'],
                     giao_vien_chu_nhiem_id=giao_vien_chu_nhiem_count % 20 + 1
                 )

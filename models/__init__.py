@@ -1,9 +1,11 @@
+from datetime import date
 import hashlib
 from sqlalchemy import Column, Enum, Integer, String, Float, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 
 from app import db
+from app.utils import get_khoi_lop
 
 day_mon = db.Table('DayMon', 
     Column('giao_vien_id', Integer, ForeignKey('GiaoVien.id'), primary_key=True),
@@ -161,7 +163,6 @@ class LopHoc(db.Model):
     __tablename__ = 'LopHoc'
     id = Column(String(5), primary_key=True)
     ten_lop = Column(String(5), )
-    so_phong = Column(String(5))
     khoi_lop = Column(Enum('Khoi10', 'Khoi11', 'Khoi12'))
     giao_vien_chu_nhiem_id = Column(ForeignKey('GiaoVien.id'))
     
@@ -170,13 +171,46 @@ class LopHoc(db.Model):
     giao_vien_day_lop = relationship('DayLop', back_populates='lop_hoc')
     hoc_sinhs = relationship('HocSinhLop', back_populates='lop_hoc', lazy=True)
     
-    def __init__(self, id, ten_lop, so_phong, khoi_lop, giao_vien_chu_nhiem_id):
+    def __init__(self, id, ten_lop, khoi_lop, giao_vien_chu_nhiem_id):
         self.id = id
         self.ten_lop = ten_lop
-        self.so_phong = so_phong
         self.khoi_lop = khoi_lop
         self.giao_vien_chu_nhiem_id = giao_vien_chu_nhiem_id
+        
+    def tach_ten_lop(self):
+        phan_so = int(''.join(filter(str.isdigit, self.ten_lop)))  # Lấy phần số
+        phan_chu = ''.join(filter(str.isalpha, self.ten_lop))  # Lấy phần chữ
+        
+        return (phan_so, phan_chu)
     
+    def get_danh_sach_hoc_sinh(self, trang_thai="DangHoc"):
+        return HocSinh.query.join(HocSinhLop).filter(HocSinhLop.lop_hoc_id == self.id, HocSinhLop.trang_thai == trang_thai).all()
+    
+    def len_lop(self, ngay_bat_dau=date.today()):
+        khoi_lop, loai_lop = self.tach_ten_lop()
+        
+        lop_moi = LopHoc(
+            id=self.hai_hoc_ky.any().get_nam_hoc(),
+            ten_lop= str(khoi_lop + 1) + loai_lop,
+            khoi_lop= get_khoi_lop(khoi_lop),
+            giao_vien_chu_nhiem_id=self.giao_vien_chu_nhiem_id
+        )
+        db.session.add(lop_moi)
+        
+        danh_sach_hoc_sinh = self.get_danh_sach_hoc_sinh()
+        
+        for hoc_sinh in danh_sach_hoc_sinh:
+            hoc_sinh_lop = HocSinhLop(
+                hoc_sinh_id = hoc_sinh.id,
+                lop_hoc_id = self.id,
+                ngay_bat_dau = ngay_bat_dau,
+                trang_thai = "DangHoc"
+            )
+            db.session.add(hoc_sinh_lop)
+            
+        db.create_all()
+        
+        
 
 
 class DayLop(db.Model):
