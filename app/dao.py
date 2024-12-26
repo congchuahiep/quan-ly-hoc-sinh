@@ -33,11 +33,7 @@ def xep_lop(nam_hoc, khoi_lop=10):
     lop_hocs = LopHoc.query.filter(LopHoc.hai_hoc_ky.any(HocKy.nam_hoc == nam_hoc), LopHoc.khoi_lop == KhoiLop(khoi_lop)).all()
     
     if (len(lop_hocs) == 0):
-        lop_hocs = tao_lop()
-        
-        print("Không có lớp?", lop_hocs)
-        
-        return
+        raise ValueError("Không còn lớp nào trống để xếp!")
     
     so_luong_lop = len(lop_hocs)
     
@@ -60,6 +56,9 @@ def tao_khoi_10_moi(nam_hoc, so_luong=5):
     from models import LopHoc, KhoiLop
     
     cac_giao_vien_chu_nhiem = giao_vien_khong_chu_nhiem(nam_hoc-1)
+    
+    if (len(cac_giao_vien_chu_nhiem) < so_luong):
+        raise ValueError("Không còn đủ giáo viên để xếp lớp!")
     
     for i in range(so_luong):
         ten_lop = "10" + chr(65 + i)
@@ -144,3 +143,18 @@ def phan_cong_ngau_nhien_giao_vien_day_hoc(nam_hoc):
             giao_vien_da_phan_cong_id.add(giao_vien.id)
             mon_hoc_da_co_id.add(mon_hoc_con_thieu.id)
         db.session.commit()
+        
+def tao_bang_diem_cho_lop(lop_hoc, mon_hoc, hoc_ky):
+    from models import BangDiem
+    
+    hoc_sinhs = lop_hoc.get_danh_sach_hoc_sinh()
+    
+    for hoc_sinh in hoc_sinhs:
+        bang_diem = BangDiem(
+            hoc_sinh_id = hoc_sinh.id,
+            mon_hoc_id = mon_hoc.id,
+            hoc_ky_id = hoc_ky.id
+        )
+        db.session.add(bang_diem)
+    db.session.commit()
+        
