@@ -1,0 +1,53 @@
+{% extends "sidebar.html" %} {% block content %}
+<div class="container-fluid p-5">
+   {% if si_so != 0 %}
+   <div class="d-flex flex-fluid mb-5 gap-3">
+      <div class="card p-3" style="width: 128px">
+         <h5 class="mt-2">Tên lớp</h5>
+         <p class="text-end">{{ lop_hoc.ten_lop }}</p>
+      </div>
+      <div class="card p-3" style="width: 128px">
+         <h5 class="mt-2">Sỉ số lớp</h5>
+         <p class="text-end">{{ si_so }}</p>
+      </div>
+   </div>
+   {% endif %}
+
+   <table class="table table-hover p-3 table-bordered" style="">
+      <thead>
+         <tr>
+            <th class="col-1" scope="col">Mã</th>
+            <th class="col-3" scope="col">Họ</th>
+            <th class="col-1" scope="col">Tên</th>
+            <th class="col-2" scope="col">Ngày sinh</th>
+            <th class="col-2" scope="col">Địa chỉ</th>
+            <th class="col-2" scope="col">Số điện thoại</th>
+            <th class="col-2" scope="col">Email</th>
+         </tr>
+      </thead>
+      {% if si_so == 0 %}
+      <tbody class="">
+         <tr>
+            <td class="text-center" colspan="12">
+               Tuyệt vời! Bạn không dạy lớp nào cả 🥳!
+            </td>
+         </tr>
+      </tbody>
+      {% else %}
+      <tbody class="">
+         {% for hocsinh in danh_sach_lop%}
+         <tr>
+            <td class="col-1" scope="row">{{hocsinh.id}}</td>
+            <td class="col-3 text-end">{{hocsinh.ho}}</td>
+            <td class="col-1">{{hocsinh.ten}}</td>
+            <td class="col-2">{{hocsinh.ngay_sinh}}</td>
+            <td class="col-2">{{hocsinh.dia_chi}}</td>
+            <td class="col-2">{{hocsinh.dien_thoai}}</td>
+            <td class="col-1">{{hocsinh.email}}</td>
+         </tr>
+         {% endfor %}
+      </tbody>
+      {% endif %}
+   </table>
+</div>
+{% endblock %}

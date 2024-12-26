@@ -1,25 +1,28 @@
 {% extends "sidebar.html" %} {% block content %}
-<div class="container">
-   <div class="d-flex flex-column justify-content-evenly" style="height: 100%">
-      <div class="text-center">
-         <h1>Xin chào, {{ basic_info.fullname }}!</h1>
-         <p>Hãy chọn bất kỳ chức năng nào bên tay phải để bắt đầu làm việc</p>
-      </div>
-      <div class="row m-4 d-flex justify-content-center gap-3">
-         {% for item in data %}
-         <div class="col-md-5 p-0">
-            <div class="card p-3 d-flex flex-row align-items-center gap-3">
-               <div class="icon-circle">
-                  {{ item.icon|safe }}
-              </div>
-               <div>
-                  <h5 class="mt-2">{{ item.title }}</h5>
-                  <p>{{ item.value }}</p>
+   <div class="container" style="height: 100%">
+      <div
+         class="d-flex flex-column justify-content-evenly"
+         style="height: 100%"
+      >
+         <div class="text-center">
+            <h1>Xin chào, {{ basic_info.fullname }}!</h1>
+            <p>
+               Hãy chọn bất kỳ chức năng nào bên tay phải để bắt đầu làm việc
+            </p>
+         </div>
+         <div class="row m-4 d-flex justify-content-center gap-3">
+            {% for item in data %}
+            <div class="col-md-5 p-0">
+               <div class="card p-3 d-flex flex-row align-items-center gap-3">
+                  <div class="icon-circle">{{ item.icon|safe }}</div>
+                  <div>
+                     <h5 class="mt-2">{{ item.title }}</h5>
+                     <p>{{ item.value }}</p>
+                  </div>
                </div>
             </div>
+            {% endfor %}
          </div>
-         {% endfor %}
       </div>
    </div>
-</div>
 {% endblock %}

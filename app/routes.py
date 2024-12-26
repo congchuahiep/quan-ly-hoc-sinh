@@ -46,8 +46,11 @@ def logout():
 def dashboard():
     user = current_user._get_current_object()
     
+    # Basic data
     basic_info = user.get_basic_info()
     nav_items = user.get_nav_item_by_role()
+    
+    # Functional Data
     data = user.get_dashboard_data()
     
     return render_template(
@@ -72,4 +75,31 @@ def score():
         title='Quản lý bảng điểm',
         basic_info=basic_info,
         nav_items=nav_items
+    )
+    
+@app.route('/homeroom')
+@login_required
+@role_required('GiaoVien')
+def homeroom():
+    from models import HocKy
+    
+    user = current_user._get_current_object()
+    
+    # Basic data
+    basic_info = user.get_basic_info()
+    nav_items = user.get_nav_item_by_role()
+    
+    # Functional Data
+    lop_hoc = user.get_lop_chu_nhiem(HocKy.nam_hoc_hien_tai())
+    danh_sach_lop = lop_hoc.get_danh_sach_hoc_sinh(doi_tuong=True)
+    si_so = len(danh_sach_lop)
+    
+    return render_template(
+        'homeroom.html',
+        title='Thông tin lớp chủ nhiệm',
+        basic_info=basic_info,
+        nav_items=nav_items,
+        lop_hoc=lop_hoc,
+        danh_sach_lop=danh_sach_lop,
+        si_so = si_so
     )

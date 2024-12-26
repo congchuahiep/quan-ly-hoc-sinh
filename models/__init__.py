@@ -72,7 +72,7 @@ class GiaoVien(NguoiDung):
     __tablename__ = 'GiaoVien'
     id = Column(Integer, ForeignKey('NguoiDung.id'), primary_key=True)
 
-    lop_chu_nhiem = relationship('LopHoc', uselist=False, back_populates='giao_vien_chu_nhiem')
+    lop_chu_nhiem = relationship('LopHoc', back_populates='giao_vien_chu_nhiem')
     lop_giao_vien_day = relationship('DayLop', back_populates='giao_vien')
     day_mon = relationship('MonHoc', secondary=day_mon, back_populates='giao_viens')
     
@@ -84,8 +84,11 @@ class GiaoVien(NguoiDung):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
                 {'href': 'score', 'icon': '<i class="bi bi-book me-2"></i>', 'title': 'Quản lý bảng điểm'},
-                {'href': 'login', 'icon': '', 'title': 'Setting'},
+                {'href': 'homeroom', 'icon': '<i class="bi bi-house-heart me-2"></i>', 'title': 'Thông tin lớp chủ nhiệm'},
         ]
+    
+    def get_lop_chu_nhiem(self, nam_hoc):
+        return LopHoc.query.filter(LopHoc.giao_vien_chu_nhiem_id == self.id, LopHoc.nam_hoc == nam_hoc).first()
     
     def get_dashboard_data(self):
         return []
@@ -200,8 +203,13 @@ class LopHoc(db.Model):
         
         return (phan_so, phan_chu)
      
-    def get_danh_sach_hoc_sinh(self, trang_thai="DangHoc"):
-        return HocSinhLop.query.filter(HocSinhLop.lop_hoc_id == self.id, HocSinhLop.trang_thai == trang_thai).all()
+    def get_danh_sach_hoc_sinh(self, trang_thai="DangHoc", doi_tuong=False):
+        hoc_sinh_lops = HocSinhLop.query.filter(HocSinhLop.lop_hoc_id == self.id, HocSinhLop.trang_thai == trang_thai).all()
+        
+        if doi_tuong:
+            return [hoc_sinh_lop.hoc_sinh for hoc_sinh_lop in hoc_sinh_lops]
+        
+        return hoc_sinh_lops
     
     @staticmethod
     def them_cac_hoc_sinh_vao_lop(lop_hoc, hoc_sinhs, ngay_bat_dau=date.today()):
@@ -493,6 +501,10 @@ class HocKy(db.Model):
         hoc_ky_hai = HocKy.query.get(nam_hoc * 10 + 2)
         
         return (hoc_ky_mot, hoc_ky_hai)
+    
+    @staticmethod
+    def nam_hoc_hien_tai():
+        return HocKy.query.order_by(HocKy.id.desc()).first().nam_hoc
     
     @hybrid_property
     def nam_hoc(self):
