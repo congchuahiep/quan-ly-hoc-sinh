@@ -399,6 +399,12 @@ class DayLop(db.Model):
     giao_vien = relationship('GiaoVien', back_populates='lop_giao_vien_day', lazy='subquery')
     hoc_ky = relationship('HocKy', back_populates='cac_giao_vien', lazy='subquery')
     mon_hoc = relationship('MonHoc', lazy='subquery')
+    
+    def __init__(self, lop_hoc_id, giao_vien_id, hoc_ky_id, mon_hoc_id):
+        self.lop_hoc_id = lop_hoc_id
+        self.giao_vien_id = giao_vien_id
+        self.hoc_ky_id = hoc_ky_id
+        self.mon_hoc_id = mon_hoc_id
 
 
 class HocSinh(db.Model):
@@ -435,6 +441,12 @@ class HocSinhLop(db.Model):
 
     hoc_sinh = relationship('HocSinh', back_populates='lich_su_lop_hoc', lazy="subquery")
     lop_hoc = relationship('LopHoc', back_populates='hoc_sinhs', lazy="subquery")
+    
+    def __init__(self, hoc_sinh_id, lop_hoc_id, ngay_bat_dau=date.today(), trang_thai="DangHoc"):
+        self.hoc_sinh_id = hoc_sinh_id
+        self.lop_hoc_id = lop_hoc_id
+        self.ngay_bat_dau = ngay_bat_dau
+        self.trang_thai = trang_thai
     
 
 class MonHoc(db.Model):
@@ -498,6 +510,11 @@ class BangDiem(db.Model):
     diem_15_phuts = relationship('Diem15Phut', back_populates='bang_diems', lazy=True)
     diem_mot_tiets = relationship('DiemMotTiet', back_populates='bang_diems', lazy=True)
     
+    def __init__(self, hoc_sinh_id, mon_hoc_id, hoc_ky_id):
+        self.hoc_sinh_id = hoc_sinh_id
+        self.mon_hoc_id = mon_hoc_id
+        self.hoc_ky_id = hoc_ky_id
+    
 
 class Diem15Phut(db.Model):
     __tablename__ = 'Diem15Phut'
@@ -506,6 +523,10 @@ class Diem15Phut(db.Model):
     bang_diem_id = Column(Integer, ForeignKey('BangDiem.id'))
 
     bang_diems = relationship('BangDiem', back_populates='diem_15_phuts', lazy=True)
+    
+    def __init__(self, diem, bang_diem_id):
+        self.diem = diem
+        self.bang_diem_id = bang_diem_id
 
 
 class DiemMotTiet(db.Model):
@@ -515,7 +536,10 @@ class DiemMotTiet(db.Model):
     bang_diem_id = Column(Integer, ForeignKey('BangDiem.id'))
 
     bang_diems = relationship('BangDiem', back_populates='diem_mot_tiets', lazy=True)
-
+    
+    def __init__(self, diem, bang_diem_id):
+        self.diem = diem
+        self.bang_diem_id = bang_diem_id
 
 class ThongKeMonHoc(db.Model):
     __tablename__ = 'ThongKeMonHoc'
@@ -527,3 +551,10 @@ class ThongKeMonHoc(db.Model):
 
     mon_hoc = relationship('MonHoc', back_populates='thong_ke_mon_hocs', lazy='subquery')
     hoc_ky = relationship('HocKy', back_populates='thong_ke_mon_hocs', lazy='subquery')
+    
+    def __init__(self, mon_hoc_id, hoc_ky_id, tong_hoc_sinh, tong_dat, ti_le_dat):
+        self.mon_hoc_id = mon_hoc_id
+        self.hoc_ky_id = hoc_ky_id
+        self.tong_hoc_sinh = tong_hoc_sinh
+        self.tong_dat = tong_dat
+        self.ti_le_dat = ti_le_dat        
