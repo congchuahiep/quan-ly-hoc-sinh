@@ -2,12 +2,14 @@ from datetime import date
 import json
 import hashlib
 import os
+import random
 
 from sqlalchemy import extract
 
 from app import app, db
 
-from models import GiaoVien, HocSinh, QuanTri, HocKy, MonHoc, LopHoc, KhoiLop
+from app.utils import get_hoc_ky
+from models import GiaoVien, HocSinh, QuanTri, HocKy, MonHoc, LopHoc, KhoiLop, BangDiem
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
 
@@ -178,14 +180,45 @@ def phan_mon_giao_vien():
         
 
 def phan_lop_giao_vien():
-    
     for nam_hoc in [21, 22, 23, 24]:
     
         lop_hocs = LopHoc.query.filter(LopHoc.nam_hoc == nam_hoc).all()
         
         for lop_hoc in lop_hocs:
             lop_hoc.phan_cong_ngau_nhien_giao_vien_day_hoc()
+            
+def tao_bang_diem():
+    mon_hocs = MonHoc.query.all()
+    
+    for nam_hoc in [21, 22, 23, 24]:
+        lop_hocs = LopHoc.query.filter(LopHoc.nam_hoc == nam_hoc).all()
         
+        for lop_hoc in lop_hocs:
+            (hoc_ky_mot, hoc_ky_hai) = get_hoc_ky(nam_hoc)
+            
+            for mon_hoc in mon_hocs:
+                lop_hoc.tao_bang_diem_cho_lop(mon_hoc, hoc_ky_mot)
+            
+            if nam_hoc != 24:
+                for mon_hoc in mon_hocs:
+                    lop_hoc.tao_bang_diem_cho_lop(mon_hoc, hoc_ky_hai)
+                    
+        print("Đã tạo xong bảng điểm năm học: ", nam_hoc)
+        
+def cap_nhat_diem():
+    bang_diems = BangDiem.query.all()
+    
+    # Tạo danh sách các giá trị của điểm là hệ số của là 0.25
+    diems = [i * 0.25 for i in range(0, 41)]
+    
+    for bang_diem in bang_diems:
+        diem_15_phut = random.choice(diems)
+        diem_mot_tiet = random.choice(diems)
+        diem_cuoi_ky = random.choice(diems)
+        
+        bang_diem.update_diem_15_phut(diem_15_phut)
+        bang_diem.update_diem_mot_tiet(diem_mot_tiet)
+        bang_diem.update_diem_cuoi_ky(diem_cuoi_ky)
 
 if __name__ == '__main__':
     
@@ -194,8 +227,8 @@ if __name__ == '__main__':
         
         db.create_all()
                      
-        ### Tạo dữ liệu basic
-        
+        ## Tạo dữ liệu basic
+        print("Khởi tạo dữ liệu căn bản cho hệ thống")
         tao_giao_vien()
         tao_mon_hoc()
         tao_quan_tri()
@@ -203,23 +236,31 @@ if __name__ == '__main__':
         tao_hoc_ky()
         
         ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
-        
+        print("Khởi tạo dữ liệu học sinh và danh sách lớp trong năm học 21")
         tao_lop_hoc_nam_21()
         tao_hoc_sinh_lop_nam_21()
         
         ### Tạo học kỳ mới: 22, 23, 24 
-        
+        print("Tạo các học kỳ mới")
         HocKy.nam_hoc_moi()
         HocKy.nam_hoc_moi()
         HocKy.nam_hoc_moi()
         
         ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
-
+        print("Khởi tạo dữ liệu học sinh và danh sách lớp trong các năm học còn lại")
         tao_lop_hoc_va_hoc_sinh_lop_con_lai()
         
         ### Phân môn giáo viên dạy
+        print("Phân công môn giáo viên")
         phan_mon_giao_vien()
         phan_lop_giao_vien()
+        
+        # Tạo bảng điểm
+        print("Tạo bảng điểm, rất nhiều bảng điểm, quá trình này có thể mất 10 phút")
+        print("Tạo dữ liệu bảng điểm, hơn 10000 bảng điểm nên hơi lâu")
+        tao_bang_diem()
+        print("Tạo chèn số điểm, hơn 10000 điểm 15 phút và 10000 điểm một tiết nên hơi lâu")
+        cap_nhat_diem()
         
         db.session.commit()
         print('Tạo dữ liệu mẫu thành công')

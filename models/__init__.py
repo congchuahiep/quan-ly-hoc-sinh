@@ -321,17 +321,20 @@ class LopHoc(db.Model):
             mon_hoc_da_co_id.add(mon_hoc_con_thieu.id)
             db.session.commit()
             
-    def tao_bang_diem_cho_lop(self, mon_hoc, hoc_ky):
-        hoc_sinhs = self.get_danh_sach_hoc_sinh()
+    def tao_bang_diem_cho_lop(self, mon_hoc, hoc_ky_id):
+        hoc_sinh_lops = self.get_danh_sach_hoc_sinh(trang_thai="HocXong")
         
-        for hoc_sinh in hoc_sinhs:
+        for hoc_sinh_lop in hoc_sinh_lops:
+            hoc_sinh = HocSinh.query.get(hoc_sinh_lop.hoc_sinh_id)
             bang_diem = BangDiem(
                 hoc_sinh_id = hoc_sinh.id,
                 mon_hoc_id = mon_hoc.id,
-                hoc_ky_id = hoc_ky.id
+                hoc_ky_id = hoc_ky_id
             )
             db.session.add(bang_diem)
         db.session.commit()
+        
+        
         
     
     def len_lop(self, ngay_bat_dau=date.today()):
@@ -507,13 +510,65 @@ class BangDiem(db.Model):
     hoc_sinh = relationship('HocSinh', back_populates='bang_diems', lazy='subquery')
     mon_hoc = relationship('MonHoc', back_populates='bang_diems', lazy='subquery')
     hoc_ky = relationship('HocKy', back_populates='bang_diem', lazy='subquery')
-    diem_15_phuts = relationship('Diem15Phut', back_populates='bang_diems', lazy=True)
-    diem_mot_tiets = relationship('DiemMotTiet', back_populates='bang_diems', lazy=True)
+    diem_15_phuts = relationship('Diem15Phut', back_populates='bang_diems', lazy=True, order_by='Diem15Phut.id')
+    diem_mot_tiets = relationship('DiemMotTiet', back_populates='bang_diems', lazy=True, order_by='DiemMotTiet.id')
     
     def __init__(self, hoc_sinh_id, mon_hoc_id, hoc_ky_id):
         self.hoc_sinh_id = hoc_sinh_id
         self.mon_hoc_id = mon_hoc_id
         self.hoc_ky_id = hoc_ky_id
+        
+        self.add_cot_diem_15_phut()
+        self.add_cot_diem_mot_tiet()
+        
+    def add_cot_diem_15_phut(self, diem=None):
+        # Kiểm tra số lượng bảng điểm
+        if (len(self.diem_15_phuts) + 1 > 5):
+            raise ValueError("Tối đa chỉ được 5 cột điểm 15 phút!")
+        diem_moi = Diem15Phut(diem=diem)
+        self.diem_15_phuts.append(diem_moi)
+        db.session.add(diem_moi)
+        db.session.commit()
+        
+    def add_cot_diem_mot_tiet(self, diem=None):
+        if (len(self.diem_mot_tiets) + 1 > 3):
+            raise ValueError("Tối đa chỉ được 3 cột điểm một tiết!")
+        diem_moi = DiemMotTiet(diem=diem)
+        self.diem_mot_tiets.append(diem_moi)
+        db.session.add(diem_moi)
+        db.session.commit()
+    
+    def xoa_cot_diem_15_phut(self, index_cot):
+        # Kiểm tra số lượng bảng điểm
+        if not (len(self.diem_15_phuts) - 1 < 1):
+            raise ValueError("Tối thiểu phải có 1 cột điểm 15 phút!")
+        Diem15Phut.query.get(self.diem_15_phuts[index_cot]).delete()
+        db.session.commit()
+    
+    def xoa_cot_diem_mot_tiet(self, index_cot):
+        # Kiểm tra số lượng bảng điểm
+        if not (len(self.diem_mot_tiets) - 1 < 1):
+            raise ValueError("Tối thiểu phải có 1 cột điểm một tiết!")
+        DiemMotTiet.query.get(self.diem_mot_tiets[index_cot]).delete()
+        db.session.commit()
+    
+    def update_diem_15_phut(self, diem, index_cot=0):
+        diem_15_phuts = self.diem_15_phuts
+        if len(diem_15_phuts) == 0:
+            raise ValueError("Lỗi kỳ lạ! Không có bảng điểm 15 phút nào tồn tại!")
+        diem_15_phuts[index_cot].update_diem(diem)
+        db.session.commit()
+    
+    def update_diem_mot_tiet(self, diem, index_cot=0):
+        diem_mot_tiets = self.diem_mot_tiets
+        if len(diem_mot_tiets) == 0:
+            raise ValueError("Lỗi kỳ lạ! Không có bảng điểm 15 phút nào tồn tại!")
+        diem_mot_tiets[index_cot].update_diem(diem)
+        db.session.commit()
+        
+    def update_diem_cuoi_ky(self, diem):
+        self.diem_cuoi_ky = diem
+        db.session.commit()
     
 
 class Diem15Phut(db.Model):
@@ -524,9 +579,11 @@ class Diem15Phut(db.Model):
 
     bang_diems = relationship('BangDiem', back_populates='diem_15_phuts', lazy=True)
     
-    def __init__(self, diem, bang_diem_id):
+    def __init__(self, diem=None):
         self.diem = diem
-        self.bang_diem_id = bang_diem_id
+        
+    def update_diem(self, diem):
+        self.diem = diem
 
 
 class DiemMotTiet(db.Model):
@@ -537,9 +594,11 @@ class DiemMotTiet(db.Model):
 
     bang_diems = relationship('BangDiem', back_populates='diem_mot_tiets', lazy=True)
     
-    def __init__(self, diem, bang_diem_id):
+    def __init__(self, diem=None):
         self.diem = diem
-        self.bang_diem_id = bang_diem_id
+    
+    def update_diem(self, diem):
+        self.diem = diem
 
 class ThongKeMonHoc(db.Model):
     __tablename__ = 'ThongKeMonHoc'
