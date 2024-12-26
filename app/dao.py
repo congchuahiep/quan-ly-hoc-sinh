@@ -4,18 +4,6 @@ import random
 from sqlalchemy import exists, extract
 from app import db
 from app.utils import chia_cac_phan_ngau_nhien, get_hoc_ky, get_nam_sinh
-    
-
-# Hàm thêm các học sinh vào vào lớp
-
-
-
-        
-
-    
-
-
-
         
 def tao_bang_diem_cho_lop(lop_hoc, mon_hoc, hoc_ky):
     from models import BangDiem
