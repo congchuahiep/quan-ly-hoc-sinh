@@ -181,6 +181,9 @@ def phan_mon_giao_vien():
 
 def phan_lop_giao_vien():
     phan_cong_ngau_nhien_giao_vien_day_hoc(21)
+    phan_cong_ngau_nhien_giao_vien_day_hoc(22)
+    phan_cong_ngau_nhien_giao_vien_day_hoc(23)
+    phan_cong_ngau_nhien_giao_vien_day_hoc(24)
         
 
 if __name__ == '__main__':
@@ -190,28 +193,28 @@ if __name__ == '__main__':
         
         db.create_all()
                      
-        # ### Tạo dữ liệu basic
+        ### Tạo dữ liệu basic
         
-        # tao_giao_vien()
-        # tao_mon_hoc()
-        # tao_quan_tri()
-        # tao_hoc_sinh()
-        # tao_hoc_ky()
+        tao_giao_vien()
+        tao_mon_hoc()
+        tao_quan_tri()
+        tao_hoc_sinh()
+        tao_hoc_ky()
         
-        # ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
+        ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
         
-        # tao_lop_hoc_nam_21()
-        # tao_hoc_sinh_lop_nam_21()
+        tao_lop_hoc_nam_21()
+        tao_hoc_sinh_lop_nam_21()
         
-        # ### Tạo học kỳ mới: 22, 23, 24 
+        ### Tạo học kỳ mới: 22, 23, 24 
         
-        # HocKy.nam_hoc_moi()
-        # HocKy.nam_hoc_moi()
-        # HocKy.nam_hoc_moi()
+        HocKy.nam_hoc_moi()
+        HocKy.nam_hoc_moi()
+        HocKy.nam_hoc_moi()
         
-        # ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
+        ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
 
-        # tao_lop_hoc_va_hoc_sinh_lop_con_lai()
+        tao_lop_hoc_va_hoc_sinh_lop_con_lai()
         
         ### Phân môn giáo viên dạy
         phan_mon_giao_vien()
