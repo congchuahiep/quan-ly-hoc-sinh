@@ -6,10 +6,8 @@ import os
 from sqlalchemy import extract
 
 from app import app, db
-from app.dao import giao_vien_khong_chu_nhiem, phan_cong_ngau_nhien_giao_vien_day_hoc, tao_khoi_10_moi, xep_lop
-from app.utils import chia_cac_phan_ngau_nhien, get_nam_sinh
-from models import HocSinh, LopHoc, MonHoc, GiaoVien, QuanTri, HocKy, KhoiLop
 
+from models import GiaoVien, HocSinh, QuanTri, HocKy, MonHoc, LopHoc, KhoiLop
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
 
@@ -147,7 +145,7 @@ def tao_hoc_sinh_lop_nam_21():
     
     # Lặp qua các khối lớp
     for khoi_lop in [10, 11, 12]:
-        xep_lop(nam_hoc, khoi_lop)
+        LopHoc.xep_lop(nam_hoc, khoi_lop)
             
             
 def tao_lop_hoc_va_hoc_sinh_lop_con_lai():
@@ -161,10 +159,10 @@ def tao_lop_hoc_va_hoc_sinh_lop_con_lai():
             lop_hoc.len_lop()
             
         # Tạo lớp 10 mới
-        tao_khoi_10_moi(nam_hoc_moi)
+        LopHoc.tao_khoi_10_moi(nam_hoc_moi)
         
-        # Thêm các học sinh năm mới
-        xep_lop(nam_hoc_moi)
+        # Xếp các học sinh năm mới vào lớp
+        LopHoc.xep_lop(nam_hoc_moi)
             
 def phan_mon_giao_vien():
     day_mon_path = os.path.join(script_dir, 'daymon.json')
@@ -180,10 +178,13 @@ def phan_mon_giao_vien():
         
 
 def phan_lop_giao_vien():
-    phan_cong_ngau_nhien_giao_vien_day_hoc(21)
-    phan_cong_ngau_nhien_giao_vien_day_hoc(22)
-    phan_cong_ngau_nhien_giao_vien_day_hoc(23)
-    phan_cong_ngau_nhien_giao_vien_day_hoc(24)
+    
+    for nam_hoc in [21, 22, 23, 24]:
+    
+        lop_hocs = LopHoc.query.filter(LopHoc.nam_hoc == nam_hoc).all()
+        
+        for lop_hoc in lop_hocs:
+            lop_hoc.phan_cong_ngau_nhien_giao_vien_day_hoc()
         
 
 if __name__ == '__main__':

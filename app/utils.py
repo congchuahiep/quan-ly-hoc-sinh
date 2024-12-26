@@ -1,6 +1,5 @@
 import random
 
-
 def get_nam_hoc(hoc_ky):
     return hoc_ky // 10
 
