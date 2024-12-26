@@ -320,6 +320,19 @@ class LopHoc(db.Model):
             giao_vien_da_phan_cong_id.add(giao_vien.id)
             mon_hoc_da_co_id.add(mon_hoc_con_thieu.id)
             db.session.commit()
+            
+    def tao_bang_diem_cho_lop(self, mon_hoc, hoc_ky):
+        hoc_sinhs = self.get_danh_sach_hoc_sinh()
+        
+        for hoc_sinh in hoc_sinhs:
+            bang_diem = BangDiem(
+                hoc_sinh_id = hoc_sinh.id,
+                mon_hoc_id = mon_hoc.id,
+                hoc_ky_id = hoc_ky.id
+            )
+            db.session.add(bang_diem)
+        db.session.commit()
+        
     
     def len_lop(self, ngay_bat_dau=date.today()):
         khoi_lop, loai_lop = self.tach_ten_lop()
