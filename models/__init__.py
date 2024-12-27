@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import datetime
 from enum import Enum as PyEnum
 import hashlib
 import json
@@ -158,7 +159,7 @@ class NhanVien(NguoiDung):
     def get_nav_item_by_role(self):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
-                {'href': 'apply-student', 'icon': '<i class="bi bi-person-plus-fill me-2"></i>', 'title': 'Tiếp nhận học sinh'},
+                {'href': 'apply_student', 'icon': '<i class="bi bi-person-plus-fill me-2"></i>', 'title': 'Tiếp nhận học sinh'},
         ]
     
     def get_role(self):
@@ -488,13 +489,38 @@ class HocSinh(db.Model):
     bang_diems = relationship('BangDiem', back_populates='hoc_sinh', lazy=True)
     
     def __init__(self, ten, ho, ngay_sinh, email, dien_thoai, dia_chi, gioi_tinh):
+        HocSinh.kiem_tra_do_tuoi(ngay_sinh)
+            
+        
         self.ten = ten
         self.ho = ho
-        self.ngay_sinh = ngay_sinh
         self.email = email
         self.dien_thoai = dien_thoai
         self.dia_chi = dia_chi
         self.gioi_tinh = gioi_tinh
+        self.ngay_sinh = ngay_sinh
+    
+    @staticmethod
+    def kiem_tra_do_tuoi(ngay_sinh):
+        min_age = QuyDinh.get_value('MIN_AGE_APPLY_HOC_SINH')
+        max_age = QuyDinh.get_value('MAX_AGE_APPLY_HOC_SINH')
+        
+        # Chuyển ngày sinh sang năm sinh
+        nam_sinh = int(ngay_sinh.split("-")[0])  # Lấy năm từ chuỗi "YYYY-MM-DD"
+        print(nam_sinh)
+        
+        # Lấy năm hiện tại
+        nam_hien_tai = datetime.today().year
+        print(nam_hien_tai)
+        # Tính độ tuổi bằng cách lấy năm hiện tại trừ năm sinh
+        age = nam_hien_tai - nam_sinh
+        print(age)
+        
+        # Kiểm tra độ tuổi có trong khoảng từ 15 đến 20 không
+        if min_age <= age <= max_age:
+            return True
+        
+        raise ValueError(f"Độ tuổi của học sinh không phù hợp: {age} tuổi! Độ tuổi của học sinh phải từ {min_age} đến {max_age}")
         
     def get_bang_diem(self, mon_hoc_id, hoc_ky_id):
         return BangDiem.query.filter(
@@ -502,7 +528,10 @@ class HocSinh(db.Model):
             BangDiem.hoc_ky_id == hoc_ky_id,
             BangDiem.mon_hoc_id == mon_hoc_id
         ).first()
-
+        
+    @staticmethod
+    def get_hoc_sinh_chua_xep_lop():
+        return HocSinh.query.filter(~HocSinh.lich_su_lop_hoc.any()).all()
 
 class HocSinhLop(db.Model):
     __tablename__ = 'HocSinhLop'
@@ -747,3 +776,8 @@ class QuyDinh(db.Model):
         
     def update_value(self, value):
         self.value = value
+        
+    @staticmethod
+    def get_value(setting_value):
+        """Get QuyDinh value by setting."""
+        return QuyDinh.query.filter_by(setting=setting_value).first().value

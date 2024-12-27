@@ -245,19 +245,76 @@ def update_policy():
         return jsonify({"error": "Đã xảy ra lỗi, vui lòng thử lại."}), 500  # Trả về mã lỗi 500 cho lỗi khác
     
 
-@app.route("/apply-student")
+@app.route("/apply-student", methods=['POST', 'GET'])
 @login_required
 @role_required('NhanVien')
 def apply_student():
+    from models import HocSinh
+    from app import db
+    
+    if request.method == 'POST':
+        try:
+            ho = request.json.get('ho')
+            ten = request.json.get('ten')
+            ngay_sinh = request.json.get('ngay_sinh')
+            email = request.json.get('email')
+            dien_thoai = request.json.get('dien_thoai')
+            dia_chi = request.json.get('dia_chi')
+            gioi_tinh = request.json.get('gioi_tinh')
+            
+            hoc_sinh = HocSinh(
+                ho=ho,
+                ten=ten,
+                ngay_sinh=ngay_sinh,
+                email=email,
+                dien_thoai=dien_thoai,
+                dia_chi=dia_chi,
+                gioi_tinh=gioi_tinh
+            )
+            
+            db.session.add(hoc_sinh)
+            db.session.commit()
+            
+            return jsonify("Thành công!")
+            
+        except ValueError as e:
+            print(e)
+            return jsonify({"error": str(e)}), 400  # Trả về mã lỗi 400 và thông điệp lỗi
+
+        except Exception as e:
+            print(e)
+            return jsonify({"error": str(e)}), 500  # Trả về mã lỗi 500 cho lỗi khác
+    
     user = current_user._get_current_object()
     
     # Basic data
     basic_info = user.get_basic_info()
     nav_items = user.get_nav_item_by_role()
     
+    #Functional Data
+    hoc_sinh_chua_xep_lop = HocSinh.get_hoc_sinh_chua_xep_lop()
+    tong_hoc_sinh_chua_xep = len(hoc_sinh_chua_xep_lop)
+    
     return render_template(
         'apply-student.html',
         title='Tiếp nhận học sinh',
         basic_info=basic_info,
         nav_items=nav_items,
+        hoc_sinh_chua_xep_lop=hoc_sinh_chua_xep_lop,
+        tong_hoc_sinh_chua_xep=tong_hoc_sinh_chua_xep
     )
+    
+@app.route("/delete-apply-student", methods=['POST'])
+@login_required
+@role_required('NhanVien')
+def delete_apply_student():
+    from models import HocSinh
+    from app import db
+    
+    id = request.json.get('id')
+    
+    HocSinh.query.get(id).delete()
+    
+    db.session.commit()
+    
+    return redirect("/apply-student")

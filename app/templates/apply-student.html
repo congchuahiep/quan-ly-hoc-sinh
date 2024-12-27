@@ -1,0 +1,271 @@
+{% extends "sidebar.html" %} {% block content %}
+<div class="container-fluid p-5">
+   <div class="d-flex flex-fluid mb-5 gap-3">
+      <div class="card p-3" style="width: 210px; max-height: 128px">
+         <h5 class="mt-2">Tổng số học sinh tiếp nhận</h5>
+         <p class="text-end">{{ tong_hoc_sinh_chua_xep }}</p>
+      </div>
+      <div class="card flex-fill p-3">
+         <h5 class="mt-2 mb-4">Tiếp nhận học sinh</h5>
+         <form class="container" id="formTiepNhanHocSinh">
+            <div id="notification"></div>
+            <div class="row gap-3">
+               <div class="col">
+                  <div class="mb-3">
+                     <label for="formHo" class="form-label">Họ học sinh</label>
+                     <input
+                        id="formHo"
+                        class="form-control"
+                        placeholder="Nguyễn Văn"
+                        required
+                     />
+                  </div>
+                  <div class="mb-3">
+                     <label for="formTen" class="form-label"
+                        >Tên học sinh</label
+                     >
+                     <input
+                        id="formTen"
+                        class="form-control"
+                        placeholder="Cường"
+                        required
+                     />
+                  </div>
+                  <div class="mb-3">
+                     <label for="formNgaySinh" class="form-label"
+                        >Ngày sinh</label
+                     >
+                     <input
+                        id="formNgaySinh"
+                        class="form-control"
+                        placeholder="Cường"
+                        type="date"
+                        required
+                     />
+                  </div>
+                  <label class="form-label">Giới tính</label>
+                  <div
+                     class="btn-group mb-3 d-grid d-md-block"
+                     role="group"
+                     aria-label="Basic radio toggle button group"
+                     id="formGioiTinh"
+                  >
+                     <input
+                        type="radio"
+                        class="btn-check"
+                        name="btnradio"
+                        id="btnradio1"
+                        autocomplete="off"
+                        value="Nam"
+                        checked
+                     />
+                     <label class="btn btn-outline-primary" for="btnradio1"
+                        >Nam</label
+                     >
+
+                     <input
+                        type="radio"
+                        class="btn-check"
+                        name="btnradio"
+                        id="btnradio2"
+                        autocomplete="off"
+                        value="Nu"
+                     />
+                     <label class="btn btn-outline-primary" for="btnradio2"
+                        >Nữ</label
+                     >
+                  </div>
+               </div>
+               <div class="col">
+                  <div class="mb-3">
+                     <label for="formEmail" class="form-label">Email</label>
+                     <input
+                        id="formEmail"
+                        class="form-control"
+                        placeholder="nguyenvancuong@gmail.com"
+                        type="email"
+                        required
+                     />
+                  </div>
+                  <div class="mb-3">
+                     <label for="formDienThoai" class="form-label"
+                        >Điện thoại</label
+                     >
+                     <input
+                        id="formDienThoai"
+                        class="form-control"
+                        placeholder="0866899778"
+                        type="phone"
+                        required
+                     />
+                  </div>
+                  <div class="mb-3">
+                     <label for="formDiaChi" class="form-label">Địa chỉ</label>
+                     <input
+                        id="formDiaChi"
+                        class="form-control"
+                        placeholder="96 Vườn chuối..."
+                        required
+                     />
+                  </div>
+                  <div class="d-grid mt-5">
+                     <button
+                        class="btn btn-success"
+                        type="button"
+                        id="saveHocSinh"
+                     >
+                        Lưu học sinh
+                     </button>
+                  </div>
+               </div>
+            </div>
+         </form>
+      </div>
+   </div>
+
+   <h4 class="mb-3">Danh sách học sinh đã nhập</h4>
+   <table class="table table-hover p-3 table-bordered">
+      <thead class="table-light">
+         <tr>
+            <th class="col-1" scope="col">#</th>
+            <th class="col-2" scope="col">Họ</th>
+            <th class="col-1" scope="col">Tên</th>
+            <th class="col-1" scope="col">Ngày sinh</th>
+            <th class="col-1" scope="col">Email</th>
+            <th class="col-1" scope="col">Điện thoại</th>
+            <th class="col-1" scope="col">Địa chỉ</th>
+            <th class="col-1" scope="col">Giới tính</th>
+            <th class="col-1" scope="col">Xoá</th>
+         </tr>
+      </thead>
+      <tbody class="" id="danhSachTiepNhan">
+         {% for hoc_sinh in hoc_sinh_chua_xep_lop %}
+         <tr data-id="{{ hoc_sinh.id }}">
+            <td class="text-center">{{ loop.index }}</td>
+            <td class="text-end">{{ hoc_sinh.ho }}</td>
+            <td>{{ hoc_sinh.ten }}</td>
+            <td>{{ hoc_sinh.ngay_sinh }}</td>
+            <td>{{ hoc_sinh.email }}</td>
+            <td>{{ hoc_sinh.dien_thoai }}</td>
+            <td>{{ hoc_sinh.dia_chi }}</td>
+            <td>{{ hoc_sinh.gioi_tinh }}</td>
+            <td class="d-grid">
+               <button class="btn btn-danger btn-remove">
+                  <i class="bi bi-trash"></i>
+               </button>
+            </td>
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
+</div>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+      // Lấy tất cả các nút chỉnh sửa
+      const removeButtons = document.querySelectorAll(".btn-remove");
+
+      removeButtons.forEach((button) => {
+         button.addEventListener("click", function () {
+            // Lấy hàng cha (tr)
+            const row = this.closest("tr");
+
+            // Lấy các giá trị từ hàng
+            const id = row.getAttribute("data-id"); // ID từ data-id
+
+            console.log(id);
+
+            fetch("");
+         });
+      });
+   });
+</script>
+
+<script>
+   const btnLuuHocSinh = document.getElementById("saveHocSinh");
+
+   btnLuuHocSinh.addEventListener("click", () => {
+      const formTiepNhanHocSinh = document.getElementById(
+         "formTiepNhanHocSinh"
+      );
+
+      formHo = formTiepNhanHocSinh.querySelector("#formHo");
+      formTen = formTiepNhanHocSinh.querySelector("#formTen");
+      formNgaySinh = formTiepNhanHocSinh.querySelector("#formNgaySinh");
+      formEmail = formTiepNhanHocSinh.querySelector("#formEmail");
+      formDienThoai = formTiepNhanHocSinh.querySelector("#formDienThoai");
+      formDiaChi = formTiepNhanHocSinh.querySelector("#formDiaChi");
+      formGioiTinh = formTiepNhanHocSinh.querySelector(
+         'input[name="btnradio"]:checked'
+      );
+
+      ho = formHo.value;
+      ten = formTen.value;
+      ngaySinh = formNgaySinh.value;
+      email = formEmail.value;
+      dienThoai = formDienThoai.value;
+      diaChi = formDiaChi.value;
+      gioiTinh = formGioiTinh.value;
+
+      // In ra console các giá trị
+      console.log("Họ: ", ho);
+      console.log("Tên: ", ten);
+      console.log("Ngày sinh: ", ngaySinh);
+      console.log("Email: ", email);
+      console.log("Điện thoại: ", dienThoai);
+      console.log("Địa chỉ: ", diaChi);
+      console.log("Giới tính: ", gioiTinh);
+
+      if (
+         !ho ||
+         !ten ||
+         !ngaySinh ||
+         !email ||
+         !dienThoai ||
+         !diaChi ||
+         !gioiTinh
+      ) {
+         const notification = document.getElementById("notification");
+         notification.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+               Xin vui lòng nhập đầy đủ trường thông tin
+            </div> `;
+         return false;
+      }
+
+      fetch("/apply-student", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+            ho: ho,
+            ten: ten,
+            ngay_sinh: ngaySinh,
+            email: email,
+            dien_thoai: dienThoai,
+            dia_chi: diaChi,
+            gioi_tinh: gioiTinh,
+         }),
+      })
+         .then((response) => {
+            // Kiểm tra nếu phản hồi không thành công
+            if (!response.ok) {
+               return response.json().then((errorData) => {
+                  throw new Error(errorData.error || "Đã xảy ra lỗi!");
+               });
+            }
+            return response.json();
+         })
+         .then(() => {
+            location.reload();
+         })
+         .catch((error) => {
+            // Xử lý lỗi nếu có
+            const notification = document.getElementById("notification");
+            notification.innerHTML = `
+               <div class="alert alert-danger" role="alert">
+                  <b>Lỗi!</b> ${error.message}
+               </div> `;
+         });
+   });
+</script>
+{% endblock %}
