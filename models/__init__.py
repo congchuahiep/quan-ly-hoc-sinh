@@ -196,7 +196,7 @@ class QuanTri(NguoiDung):
     def get_nav_item_by_role(self):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
-                {'href': 'login', 'icon': '', 'title': 'Contact'},
+                {'href': 'course', 'icon': '<i class="bi bi-journal-bookmark me-2"></i>', 'title': 'Quản lý môn học'},
                 {'href': 'login', 'icon': '', 'title': 'Setting'},
         ]
         

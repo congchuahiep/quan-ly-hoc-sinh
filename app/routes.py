@@ -168,3 +168,29 @@ def homeroom():
         danh_sach_lop=danh_sach_lop,
         si_so = si_so
     )
+    
+@app.route("/course")
+@login_required
+@role_required('QuanTri')
+def course():
+    from models import MonHoc
+    
+    user = current_user._get_current_object()
+    
+    # Basic data
+    basic_info = user.get_basic_info()
+    nav_items = user.get_nav_item_by_role()
+    
+    # Functional Data
+    mon_hocs = MonHoc.query.all()
+    tong_so_mon = len(mon_hocs)
+    
+    return render_template(
+        'course.html',
+        title='Quản lý môn học',
+        basic_info=basic_info,
+        nav_items=nav_items,
+        tong_so_mon=tong_so_mon,
+        mon_hocs=mon_hocs
+    )
+    

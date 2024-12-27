@@ -17,3 +17,6 @@
 Năm học kỳ (2 con số) + Khối lớp + Số lớp (A, B, C, E)
 ```
 Ví dụ lớp 12B năm học 2022 - 2023: `2212A`
+
+# TODO
+- Thêm khả năng cho phép chức năng `Thêm môn học hoạt động`
