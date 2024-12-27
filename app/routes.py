@@ -313,8 +313,8 @@ def delete_apply_student():
     
     id = request.json.get('id')
     
-    HocSinh.query.get(id).delete()
-    
+    hoc_sinh = HocSinh.query.get(id)
+    db.session.delete(hoc_sinh)
     db.session.commit()
     
-    return redirect("/apply-student")
+    return jsonify("Thành công!")

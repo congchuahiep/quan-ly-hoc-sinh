@@ -175,7 +175,15 @@
 
             console.log(id);
 
-            fetch("");
+            fetch("/delete-apply-student", {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({
+                  id: id,
+               }),
+            }).then(() => {
+               location.reload();
+            });
          });
       });
    });
