@@ -69,7 +69,6 @@ def tao_mon_hoc():
             db.session.add(mon_hoc)
         db.session.commit()
 
-
 def tao_quan_tri():
     quan_tri_path = os.path.join(script_dir, 'quantri.json')
     
