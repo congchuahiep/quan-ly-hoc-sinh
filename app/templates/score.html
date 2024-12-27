@@ -1,5 +1,5 @@
 {% extends "sidebar.html" %} {% block content %}
-<div class="container-fluid p-5">
+<div class="container-fluid pt-5 px-5">
    <div class="card mb-5 p-3">
       <h5 class="mt-3">Chọn bảng điểm</h5>
       <div class="row gap-3 mb-2 justify-content-end p-3">
@@ -203,8 +203,12 @@
                diemCuoiKy.textContent = item["diem_cuoi_ky"];
                row.appendChild(diemCuoiKy);
 
+               const bocNutSua = document.createElement("td");
+               bocNutSua.className = "d-grid"
+               row.appendChild(bocNutSua);
+
                const nutSua = document.createElement("button");
-               nutSua.textContent = "Sửa điểm";
+               nutSua.innerHTML = `<i class="bi bi-wrench"></i>`;
                nutSua.type = "button";
                nutSua.className = "btn btn-warning btn-sm";
                nutSua.dataset.bsToggle = "modal";
@@ -394,7 +398,7 @@
                      );
                });
 
-               row.appendChild(nutSua);
+               bocNutSua.appendChild(nutSua);
 
                bangDiemTable.appendChild(row);
             });
