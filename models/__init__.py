@@ -197,7 +197,7 @@ class QuanTri(NguoiDung):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
                 {'href': 'course', 'icon': '<i class="bi bi-journal-bookmark me-2"></i>', 'title': 'Quản lý môn học'},
-                {'href': 'login', 'icon': '', 'title': 'Setting'},
+                {'href': 'policy', 'icon': '<i class="bi bi-card-list me-2"></i>', 'title': 'Quản lý quy định'},
         ]
         
     def get_role(self):
@@ -737,3 +737,33 @@ class ThongKeMonHoc(db.Model):
         self.tong_hoc_sinh = tong_hoc_sinh
         self.tong_dat = tong_dat
         self.ti_le_dat = ti_le_dat        
+
+
+class QuyDinh(db.Model):
+    __tablename__ = 'QuyDinh'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    setting = Column(String(100), unique=True, nullable=False)
+    detail = Column(String(255), nullable=False)
+    value = Column(Integer, nullable=False)
+
+    def to_dict(self):
+        """Convert the PolicyItem to a dictionary."""
+        return {
+            "id": self.id,
+            "setting": self.setting,
+            "detail": self.detail,
+            "value": self.value
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a PolicyItem from a dictionary."""
+        return cls(
+            setting=data["setting"],
+            detail=data["detail"],
+            value=data["value"]
+        )
+        
+    def update_value(self, value):
+        self.value = value

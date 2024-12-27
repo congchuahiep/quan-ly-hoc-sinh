@@ -1,0 +1,167 @@
+{% extends "sidebar.html" %} {% block content %}
+<div class="container-fluid p-5">
+   <div class="d-flex flex-fluid mb-5 gap-3">
+      <div class="card p-3" style="width: 128px">
+         <h5 class="mt-2">Tổng số quy định</h5>
+         <p class="text-end">{{ tong_quy_dinh }}</p>
+      </div>
+   </div>
+
+   <div id="notification"></div>
+
+   <table class="table table-hover p-3 table-bordered">
+      <thead class="table-light">
+         <tr>
+            <th class="col-6" scope="col">Quy định</th>
+            <th class="col-1" scope="col">Giá trị</th>
+            <th class="col-1" scope="col">Thay đổi giá trị</th>
+         </tr>
+      </thead>
+      <tbody class="">
+         {% for quy_dinh in quy_dinhs %}
+         <tr data-id="{{ quy_dinh.id }}">
+            <td scope="row">{{ quy_dinh.detail }}</td>
+            <td class="text-end">{{ quy_dinh.value }}</td>
+            <td class="d-grid">
+               <button
+                  class="btn btn-warning btn-edit"
+                  data-bs-toggle="modal"
+                  data-bs-target="#suaQuyDinhModal"
+               >
+                  <i class="bi bi-wrench"></i>
+               </button>
+            </td>
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
+</div>
+
+<div class="modal fade" id="suaQuyDinhModal" tabindex="-1">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">
+               Chỉnh sửa quy định
+            </h1>
+            <button
+               type="button"
+               class="btn-close"
+               data-bs-dismiss="modal"
+               aria-label="Close"
+            ></button>
+         </div>
+         <div class="modal-body" id="thongTinQuyDinh">
+            <form id="formSuaQuyDinh">
+               <input type="hidden" id="modalId" />
+               <div class="mb-3">
+                  <label for="modalDetail" class="form-label">Mô tả</label>
+                  <input
+                     type="text"
+                     class="form-control"
+                     id="modalDetail"
+                     disabled
+                     readonly
+                  />
+               </div>
+               <div class="mb-3">
+                  <label for="modalValue" class="form-label">Giá trị</label>
+                  <input type="number" class="form-control" id="modalValue" />
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button
+               type="button"
+               class="btn btn-secondary"
+               data-bs-dismiss="modal"
+            >
+               Đóng
+            </button>
+            <button type="button" class="btn btn-primary" id="saveQuyDinh">
+               Lưu thay đổi
+            </button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+      // Lấy tất cả các nút chỉnh sửa
+      const editButtons = document.querySelectorAll(".btn-edit");
+
+      editButtons.forEach((button) => {
+         button.addEventListener("click", function () {
+            // Lấy hàng cha (tr)
+            const row = this.closest("tr");
+
+            // Lấy các giá trị từ hàng
+            const id = row.getAttribute("data-id"); // ID từ data-id
+            const detail = row.children[0].textContent.trim(); // Text ở cột 1
+            const value = row.children[1].textContent.trim(); // Text ở cột 2
+
+            // Điền vào form modal
+            document.getElementById("modalDetail").value = detail;
+            document.getElementById("modalValue").value = value;
+            document.getElementById("modalId").value = id;
+         });
+      });
+   });
+</script>
+
+<script>
+   const btnLuuQuyDinh = document.getElementById("saveQuyDinh");
+
+   btnLuuQuyDinh.addEventListener("click", () => {
+      const formSuaQuyDinh = document.getElementById("formSuaQuyDinh");
+
+      quyDinhIdInput = formSuaQuyDinh.querySelector("#modalId")
+      quyDinhValue = formSuaQuyDinh.querySelector("#modalValue")
+
+      id = quyDinhIdInput.value
+      value = quyDinhValue.value
+
+      fetch("/update-policy", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+            quy_dinh_id: id,
+            quy_dinh_value: value,
+         }),
+      })
+         .then((response) => {
+            if (!response.ok) {
+               throw new Error("Giá trị nhập vào không hợp lệ!");
+            }
+            return response.json(); // Chuyển đổi phản hồi thành JSON
+         })
+         .then((data) => {
+            const row = document.querySelector(`tr[data-id='${id}']`);
+
+            if (row) {
+               row.querySelector("td:nth-child(2)").textContent = value;
+            }
+
+            const notification = document.getElementById("notification");
+            notification.innerHTML = `
+               <div class="alert alert-primary" role="alert">
+                  Cập nhật quy định thành công!
+               </div> `;
+         })
+         .catch((error) => {
+            const notification = document.getElementById("notification");
+            notification.innerHTML = `
+               <div class="alert alert-danger" role="alert">
+                  Cập nhật quy định! ${error.message}
+               </div>`;
+         });
+
+      // Đóng modal
+      const modal = bootstrap.Modal.getInstance(
+         document.getElementById("suaQuyDinhModal")
+      );
+      modal.hide();
+   });
+</script>
+{% endblock %}

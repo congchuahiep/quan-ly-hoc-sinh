@@ -194,3 +194,55 @@ def course():
         mon_hocs=mon_hocs
     )
     
+
+@app.route("/policy")
+@login_required
+@role_required('QuanTri')
+def policy():
+    from models import QuyDinh
+    
+    user = current_user._get_current_object()
+    
+    # Basic data
+    basic_info = user.get_basic_info()
+    nav_items = user.get_nav_item_by_role()
+    
+    # Functional Data
+    quy_dinhs = QuyDinh.query.all()
+    tong_quy_dinh = len(quy_dinhs)
+    
+    return render_template(
+        'policy.html',
+        title='Quản lý quy định',
+        basic_info=basic_info,
+        nav_items=nav_items,
+        tong_quy_dinh=tong_quy_dinh,
+        quy_dinhs=quy_dinhs
+    )
+    
+@app.route("/update-policy", methods=['POST'])
+@login_required
+@role_required('QuanTri')
+def update_policy():
+    from models import QuyDinh
+    from app import db
+    user = current_user._get_current_object()
+    
+    try:
+        quy_dinh_id = request.json.get('quy_dinh_id')
+        quy_dinh_value = request.json.get('quy_dinh_value')
+        
+        quy_dinh = QuyDinh.query.get(quy_dinh_id)
+        quy_dinh.update_value(quy_dinh_value)
+        
+        db.session.commit()
+        
+        return jsonify(quy_dinh.to_dict())
+        
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400  # Trả về mã lỗi 400 và thông điệp lỗi
+
+    except Exception as e:
+        return jsonify({"error": "Đã xảy ra lỗi, vui lòng thử lại."}), 500  # Trả về mã lỗi 500 cho lỗi khác
+    
+    

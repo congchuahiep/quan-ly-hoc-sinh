@@ -9,7 +9,7 @@ from sqlalchemy import extract
 from app import app, db
 
 from app.utils import get_hoc_ky
-from models import GiaoVien, HocSinh, QuanTri, HocKy, MonHoc, LopHoc, KhoiLop, BangDiem
+from models import GiaoVien, HocSinh, QuanTri, HocKy, MonHoc, LopHoc, KhoiLop, BangDiem, QuyDinh
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
 
@@ -218,6 +218,25 @@ def cap_nhat_diem():
         bang_diem.update_diem_15_phut(diem_15_phut)
         bang_diem.update_diem_mot_tiet(diem_mot_tiet)
         bang_diem.update_diem_cuoi_ky(diem_cuoi_ky)
+        
+def tao_quy_dinh():
+    quy_dinh_path = os.path.join(script_dir, 'policy.json')
+    
+    with open(quy_dinh_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        
+        """Load policies from JSON data."""
+        for item in data:
+            existing_policy = QuyDinh.query.filter_by(setting=item["setting"]).first()
+            if existing_policy:
+                # Update existing policy
+                existing_policy.detail = item["detail"]
+                existing_policy.value = item["value"]
+            else:
+                # Add new policy
+                policy_item = QuyDinh.from_dict(item)
+                db.session.add(policy_item)
+        db.session.commit()
 
 if __name__ == '__main__':
     
@@ -226,40 +245,42 @@ if __name__ == '__main__':
         
         db.create_all()
                      
-        ## Tạo dữ liệu basic
-        print("Khởi tạo dữ liệu căn bản cho hệ thống")
-        tao_giao_vien()
-        tao_mon_hoc()
-        tao_quan_tri()
-        tao_hoc_sinh()
-        tao_hoc_ky()
+        # ## Tạo dữ liệu basic
+        # print("Khởi tạo dữ liệu căn bản cho hệ thống")
+        # tao_giao_vien()
+        # tao_mon_hoc()
+        # tao_quan_tri()
+        # tao_hoc_sinh()
+        # tao_hoc_ky()
         
-        ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
-        print("Khởi tạo dữ liệu học sinh và danh sách lớp trong năm học 21")
-        tao_lop_hoc_nam_21()
-        tao_hoc_sinh_lop_nam_21()
+        # ### Tạo lớp học và xếp các học sinh vào lớp ở năm học 21
+        # print("Khởi tạo dữ liệu học sinh và danh sách lớp trong năm học 21")
+        # tao_lop_hoc_nam_21()
+        # tao_hoc_sinh_lop_nam_21()
         
-        ### Tạo học kỳ mới: 22, 23, 24 
-        print("Tạo các học kỳ mới")
-        HocKy.nam_hoc_moi()
-        HocKy.nam_hoc_moi()
-        HocKy.nam_hoc_moi()
+        # ### Tạo học kỳ mới: 22, 23, 24 
+        # print("Tạo các học kỳ mới")
+        # HocKy.nam_hoc_moi()
+        # HocKy.nam_hoc_moi()
+        # HocKy.nam_hoc_moi()
         
-        ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
-        print("Khởi tạo dữ liệu học sinh và danh sách lớp trong các năm học còn lại")
-        tao_lop_hoc_va_hoc_sinh_lop_con_lai()
+        # ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
+        # print("Khởi tạo dữ liệu học sinh và danh sách lớp trong các năm học còn lại")
+        # tao_lop_hoc_va_hoc_sinh_lop_con_lai()
         
-        ### Phân môn giáo viên dạy
-        print("Phân công môn giáo viên")
-        phan_mon_giao_vien()
-        phan_lop_giao_vien()
+        # ### Phân môn giáo viên dạy
+        # print("Phân công môn giáo viên")
+        # phan_mon_giao_vien()
+        # phan_lop_giao_vien()
         
-        # Tạo bảng điểm
-        print("Tạo bảng điểm, rất nhiều bảng điểm, quá trình này có thể mất 30 phút")
-        print("Tạo dữ liệu bảng điểm, hơn 10000 bảng điểm nên hơi lâu")
-        tao_bang_diem()
-        print("Tạo chèn số điểm, hơn 10000 điểm 15 phút và 10000 điểm một tiết nên hơi lâu")
-        cap_nhat_diem()
+        # # Tạo bảng điểm
+        # print("Tạo bảng điểm, rất nhiều bảng điểm, quá trình này có thể mất 30 phút")
+        # print("Tạo dữ liệu bảng điểm, hơn 10000 bảng điểm nên hơi lâu")
+        # tao_bang_diem()
+        # print("Tạo chèn số điểm, hơn 10000 điểm 15 phút và 10000 điểm một tiết nên hơi lâu")
+        # cap_nhat_diem()
+        
+        tao_quy_dinh()
         
         db.session.commit()
         print('Tạo dữ liệu mẫu thành công')

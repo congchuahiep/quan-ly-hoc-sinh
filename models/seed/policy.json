@@ -1,0 +1,17 @@
+[
+    {
+        "setting": "MAX_HOC_SINH_IN_LOP_HOC",
+        "detail": "Số học sinh tối đa trong một lớp học",
+        "value": 40
+    },   
+    {
+        "setting": "MIN_AGE_APPLY_HOC_SINH",
+        "detail": "Số tuổi tối thiểu để tiếp nhận học sinh",
+        "value": 15
+    },  
+    {
+        "setting": "MAX_AGE_APPLY_HOC_SINH",
+        "detail": "Số tuổi tối đa để tiếp nhận học sinh",
+        "value": 20
+    }
+]
