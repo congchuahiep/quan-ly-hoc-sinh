@@ -9,7 +9,7 @@ from sqlalchemy import extract
 from app import app, db
 
 from app.utils import get_hoc_ky
-from models import GiaoVien, HocSinh, QuanTri, HocKy, MonHoc, LopHoc, KhoiLop, BangDiem, QuyDinh
+from models import GiaoVien, HocSinh, QuanTri, HocKy, MonHoc, LopHoc, KhoiLop, BangDiem, QuyDinh, NhanVien
 # Lấy đường dẫn của thư mục hiện tại
 script_dir = os.path.dirname(__file__)
 
@@ -35,6 +35,27 @@ def tao_giao_vien():
             db.session.add(giao_vien)
         db.session.commit()
         
+def tao_nhan_vien():
+    nhan_vien_path = os.path.join(script_dir, 'nhanvien.json')
+    
+    with open(nhan_vien_path, 'r', encoding= 'utf-8') as file:
+        data = json.load(file)
+        for item in data:
+            giao_vien = NhanVien(
+                username=item['username'],
+                password=item['password'],
+                avatar=item['avatar'],
+                ten=item['ten'],
+                ho=item['ho'],
+                ngay_sinh=item['ngay_sinh'],
+                email=item['email'],
+                dien_thoai=item['dien_thoai'],
+                dia_chi=item['dia_chi'],
+                loai_nguoi_dung=item['loai_nguoi_dung'],
+                gioi_tinh=item['gioi_tinh']
+            )
+            db.session.add(giao_vien)
+        db.session.commit()
         
 def tao_mon_hoc():
     mon_hoc_path = os.path.join(script_dir, 'monhoc.json')
@@ -248,6 +269,7 @@ if __name__ == '__main__':
         # ## Tạo dữ liệu basic
         # print("Khởi tạo dữ liệu căn bản cho hệ thống")
         # tao_giao_vien()
+        tao_nhan_vien()
         # tao_mon_hoc()
         # tao_quan_tri()
         # tao_hoc_sinh()
@@ -280,7 +302,7 @@ if __name__ == '__main__':
         # print("Tạo chèn số điểm, hơn 10000 điểm 15 phút và 10000 điểm một tiết nên hơi lâu")
         # cap_nhat_diem()
         
-        tao_quy_dinh()
+        # tao_quy_dinh()
         
         db.session.commit()
         print('Tạo dữ liệu mẫu thành công')

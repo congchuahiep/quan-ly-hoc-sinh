@@ -1,0 +1,54 @@
+[
+    {
+       "username": "staff1",
+       "password": "password1",
+       "avatar": "https://robohash.org/iddoloremrepellat.png?size=48x48&set=set1",
+       "ten": "A",
+       "ho": "Nguyễn Văn",
+       "ngay_sinh": "1980-01-01",
+       "email": "staff1@example.com",
+       "dien_thoai": "0123456789",
+       "dia_chi": "123 Street A",
+       "loai_nguoi_dung": "NhanVien",
+       "gioi_tinh": "Nam"
+    },
+    {
+       "username": "staff2",
+       "password": "password2",
+       "avatar": "https://robohash.org/veniamquisfuga.png?size=48x48&set=set1",
+       "ten": "B",
+       "ho": "Trần Thị",
+       "ngay_sinh": "1981-02-02",
+       "email": "staff2@example.com",
+       "dien_thoai": "0123456790",
+       "dia_chi": "456 Street B",
+       "loai_nguoi_dung": "NhanVien",
+       "gioi_tinh": "Nu"
+    },
+    {
+       "username": "staff3",
+       "password": "password3",
+       "avatar": "https://robohash.org/ducimusnihilut.png?size=48x48&set=set1",
+       "ten": "C",
+       "ho": "Lê Văn",
+       "ngay_sinh": "1982-03-03",
+       "email": "staff3@example.com",
+       "dien_thoai": "0123456791",
+       "dia_chi": "789 Street C",
+       "loai_nguoi_dung": "NhanVien",
+       "gioi_tinh": "Nam"
+    },
+    {
+       "username": "staff4",
+       "password": "password4",
+       "avatar": "https://robohash.org/omnisrepudiandaedolor.png?size=48x48&set=set1",
+       "ten": "D",
+       "ho": "Phạm Thị",
+       "ngay_sinh": "1983-04-04",
+       "email": "staff4@example.com",
+       "dien_thoai": "0123456792",
+       "dia_chi": "101 Street D",
+       "loai_nguoi_dung": "NhanVien",
+       "gioi_tinh": "Nu"
+    }
+]
