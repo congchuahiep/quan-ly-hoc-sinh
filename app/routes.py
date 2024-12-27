@@ -318,3 +318,59 @@ def delete_apply_student():
     db.session.commit()
     
     return jsonify("Thành công!")
+
+@app.route("/course-summary", methods=['GET', 'POST'])
+@login_required
+@role_required('QuanTri')
+def course_summary():
+    from models import HocKy, MonHoc, LopHoc, KhoiLop
+    
+    if request.method == 'POST':
+        try:
+            mon_hoc_id = request.json.get('mon_hoc_id')
+            hoc_ky_id = request.json.get('hoc_ky_id')
+            khoi_lop = request.json.get('khoi_lop')
+            
+            lop_hocs = LopHoc.query.filter(
+                LopHoc.hai_hoc_ky.any(HocKy.id == hoc_ky_id),
+                LopHoc.khoi_lop == KhoiLop(int(khoi_lop)))
+            
+            danh_sach_tong_ket = []
+            
+            for lop_hoc in lop_hocs:
+                si_so = lop_hoc.si_so()
+                tong_dat = lop_hoc.tinh_tong_dat_mon_hoc(mon_hoc_id, hoc_ky_id)
+                ty_le_dat = lop_hoc.ty_le_dat_mon_hoc(tong_dat, si_so)
+                
+                tong_ket = {
+                    "ten_lop": lop_hoc.ten_lop,
+                    "si_so": si_so,
+                    "tong_dat": tong_dat,
+                    "ty_le_dat": ty_le_dat
+                }
+                
+                danh_sach_tong_ket.append(tong_ket)
+                
+            return jsonify(danh_sach_tong_ket)
+            
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+    
+    user = current_user._get_current_object()
+    
+    # Basic data
+    basic_info = user.get_basic_info()
+    nav_items = user.get_nav_item_by_role()
+    
+    # Functional Data
+    danh_sach_hoc_ky = HocKy.query.order_by(HocKy.id.desc()).all()
+    danh_sach_mon_hoc = MonHoc.query.all()
+    
+    return render_template(
+        'course-summary.html',
+        title='Tổng kết môn học',
+        basic_info=basic_info,
+        nav_items=nav_items,
+        danh_sach_hoc_ky=danh_sach_hoc_ky,
+        danh_sach_mon_hoc=danh_sach_mon_hoc
+    )

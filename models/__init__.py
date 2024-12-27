@@ -266,6 +266,27 @@ class LopHoc(db.Model):
             danh_sach_diem.append(bang_diem_hoc_sinh)
             
         return danh_sach_diem
+    
+    def tinh_tong_dat_mon_hoc(self, mon_hoc_id, hoc_ky_id):
+        danh_sach_hoc_sinh = self.get_danh_sach_hoc_sinh(doi_tuong=True)
+        
+        total_dat = 0
+        
+        for hoc_sinh in danh_sach_hoc_sinh:
+            bang_diem = hoc_sinh.get_bang_diem(mon_hoc_id, hoc_ky_id)
+            
+            diem_trung_binh = bang_diem.tinh_diem_trung_binh()
+            
+            if diem_trung_binh >= 5:
+                total_dat += 1
+                
+        return total_dat
+    
+    def si_so(self):
+        return len(self.get_danh_sach_hoc_sinh())
+        
+    def ty_le_dat_mon_hoc(self, tong_dat, si_so):
+        return tong_dat / si_so * 100.0
         
     @staticmethod
     def them_cac_hoc_sinh_vao_lop(lop_hoc, hoc_sinhs, ngay_bat_dau=date.today()):
@@ -419,7 +440,7 @@ class LopHoc(db.Model):
             return None
         
         ten_lop_moi = str(khoi_lop + 1) + loai_lop
-        (hoc_ky_mot_moi, hoc_ky_hai_moi) = HocKy.get_hoc_ky(nam_hoc_moi)
+        (hoc_ky_mot_moi) = HocKy.get_hoc_ky(nam_hoc_moi)
         
         print(self.id, " -> ", str(nam_hoc_moi) + ten_lop_moi)
         
@@ -431,7 +452,6 @@ class LopHoc(db.Model):
             giao_vien_chu_nhiem_id=self.giao_vien_chu_nhiem_id
         )
         lop_moi.hai_hoc_ky.append(hoc_ky_mot_moi)
-        lop_moi.hai_hoc_ky.append(hoc_ky_hai_moi)
         
         db.session.add(lop_moi)
         
@@ -577,13 +597,15 @@ class HocKy(db.Model):
         self.id = id
         
     @staticmethod
-    def nam_hoc_moi():
-        nam_hoc_cu = HocKy.query.order_by(HocKy.id.desc()).first().nam_hoc
-        nam_hoc_moi = nam_hoc_cu + 1
-        hoc_ky_mot = HocKy(id=nam_hoc_moi * 10 + 1)
-        hoc_ky_hai = HocKy(id=nam_hoc_moi * 10 + 2)
+    def hoc_ky_moi():
+        hoc_ky_cu = HocKy.query.order_by(HocKy.id.desc()).first().id
+
+        if hoc_ky_cu % 2 == 1:
+            hoc_ky_moi = HocKy(id=hoc_ky_cu + 1)
+        else:
+            hoc_ky_moi = HocKy(id=hoc_ky_cu + 9)
         
-        db.session.add_all([hoc_ky_mot, hoc_ky_hai])
+        db.session.add(hoc_ky_moi)
         db.session.commit()
     
     @staticmethod
@@ -623,6 +645,28 @@ class BangDiem(db.Model):
         
         self.add_cot_diem_15_phut()
         self.add_cot_diem_mot_tiet()
+        
+    def tinh_diem_trung_binh(self):
+        # Tính trung bình điểm 15 phút
+        if self.diem_15_phuts:
+            diem_15_phut_trung_binh = sum([diem.diem for diem in self.diem_15_phuts]) / len(self.diem_15_phuts)
+        else:
+            diem_15_phut_trung_binh = 0
+
+        # Tính trung bình điểm 1 tiết
+        if self.diem_mot_tiets:
+            diem_1_tiet_trung_binh = sum([diem.diem for diem in self.diem_mot_tiets]) / len(self.diem_mot_tiets)
+        else:
+            diem_1_tiet_trung_binh = 0
+
+        # Điểm cuối kỳ
+        diem_cuoi_ky = self.diem_cuoi_ky if self.diem_cuoi_ky else 0
+
+        # Tính điểm trung bình theo công thức
+        diem_trung_binh = (diem_15_phut_trung_binh * 0.2) + (diem_1_tiet_trung_binh * 0.3) + (diem_cuoi_ky * 0.5)
+        
+        return diem_trung_binh
+        
         
     def get_bang_diem(self):
         bang_diem = {

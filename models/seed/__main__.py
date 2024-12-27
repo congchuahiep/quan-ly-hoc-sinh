@@ -280,11 +280,14 @@ if __name__ == '__main__':
         # tao_lop_hoc_nam_21()
         # tao_hoc_sinh_lop_nam_21()
         
-        # ### Tạo học kỳ mới: 22, 23, 24 
+        # ### Tạo học kỳ mới: 221, 222, 231, 232, 241, 242 
         # print("Tạo các học kỳ mới")
-        # HocKy.nam_hoc_moi()
-        # HocKy.nam_hoc_moi()
-        # HocKy.nam_hoc_moi()
+        # HocKy.hoc_ky_moi()
+        # HocKy.hoc_ky_moi()
+        # HocKy.hoc_ky_moi()
+        # HocKy.hoc_ky_moi()
+        # HocKy.hoc_ky_moi()
+        # HocKy.hoc_ky_moi()
         
         # ### Sau khi đã có học kỳ mới, tạo lớp xếp các học sinh còn lại
         # print("Khởi tạo dữ liệu học sinh và danh sách lớp trong các năm học còn lại")

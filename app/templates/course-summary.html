@@ -1,0 +1,213 @@
+{% extends "sidebar.html" %} {% block content %}
+<div class="container-fluid pt-5 px-5">
+   <div class="card mb-5 p-3">
+      <h5 class="mt-3">Chọn thông tin tổng kết môn học</h5>
+      <div class="row gap-3 mb-2 justify-content-end p-3">
+         <div class="col">
+            <label class="form-label" for="selectMonHoc">Môn học</label>
+            <select class="form-select" id="selectMonHoc">
+               <option selected disabled value="">Chọn môn học</option>
+               {% for mon_hoc in danh_sach_mon_hoc %}
+               <option value="{{mon_hoc.id}}">
+                  Môn {{mon_hoc.ten_mon_hoc}}
+               </option>
+               {% endfor %}
+            </select>
+         </div>
+         <div class="col">
+            <label class="form-label" for="selectHocKy">Học kỳ</label>
+            <select class="form-select" id="selectHocKy">
+               <option selected disabled value="">Chọn học kỳ</option>
+               {% for hoc_ky in danh_sach_hoc_ky %}
+               <option value="{{hoc_ky.id}}">Học kỳ {{hoc_ky.id}}</option>
+               {% endfor %}
+            </select>
+         </div>
+         <div class="col">
+            <label class="form-label" for="selectKhoiLop">Khối lớp</label>
+            <select class="form-select" id="selectKhoiLop">
+               <option selected disabled id="firstOption" value="">
+                  Chọn khối lớp
+               </option>
+               <option value="10">Khối 10</option>
+               <option value="11">Khối 11</option>
+               <option value="12">Khối 12</option>
+            </select>
+         </div>
+      </div>
+   </div>
+
+   <div id="notification"></div>
+
+   <table class="table table-hover p-3 mb-3 table-bordered">
+      <thead class="table-light">
+         <tr>
+            <th class="col-1" scope="col">STT</th>
+            <th class="col-3" scope="col">Tên lớp</th>
+            <th class="col-3" scope="col">Sĩ số</th>
+            <th class="col-3" scope="col">Số lượng đạt</th>
+            <th class="col-2" scope="col">Tỉ lệ đạt</th>
+         </tr>
+      </thead>
+      <tbody id="tongKetTable"></tbody>
+   </table>
+   <div class="justify-content-center">
+      <canvas width="800" height="400" id="horizonChart"></canvas>
+   </div>
+</div>
+
+<script>
+   const selectMonHoc = document.getElementById("selectMonHoc");
+   const selectHocKy = document.getElementById("selectHocKy");
+   const selectKhoiLop = document.getElementById("selectKhoiLop");
+
+   function renderTongKet() {
+      monHocId = selectMonHoc.value;
+      hocKyId = selectHocKy.value;
+      khoiLop = selectKhoiLop.value;
+
+      const tongKetTable = document.getElementById("tongKetTable");
+
+      tongKetTable.innerHTML = ``;
+
+      fetch("/course-summary", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+            mon_hoc_id: monHocId,
+            hoc_ky_id: hocKyId,
+            khoi_lop: khoiLop,
+         }),
+      })
+         .then((response) => {
+            if (!response.ok) {
+               // Kiểm tra xem response có thành công không
+               return response.json().then((errorData) => {
+                  throw new Error(errorData.error); // Ném lỗi về phía catch
+               });
+            }
+            return response.json(); // Nếu không có lỗi, trả về dữ liệu
+         })
+         .then((data) => {
+            data.forEach((lop_hoc, index) => {
+               const row = document.createElement("tr");
+
+               const indexCell = document.createElement("td");
+               indexCell.textContent = index + 1;
+               row.appendChild(indexCell);
+
+               const tenLopCell = document.createElement("td");
+               tenLopCell.textContent = lop_hoc["ten_lop"];
+               row.appendChild(tenLopCell);
+
+               const siSoCell = document.createElement("td");
+               siSoCell.textContent = lop_hoc["si_so"];
+               row.appendChild(siSoCell);
+
+               const soLuongDatCell = document.createElement("td");
+               soLuongDatCell.textContent = lop_hoc["tong_dat"];
+               row.appendChild(soLuongDatCell);
+
+               const tiLeDatCell = document.createElement("td");
+               tiLeDatCell.textContent = lop_hoc["ty_le_dat"].toFixed(2) + "%";
+               row.appendChild(tiLeDatCell);
+
+               tongKetTable.appendChild(row);
+            });
+
+            const labels = data.map((item) => item.ten_lop);
+            const tyLeDat = data.map((item) => item.ty_le_dat);
+
+            // Vẽ biểu đồ 2
+            const ctx2 = document
+               .getElementById("horizonChart")
+               .getContext("2d");
+
+            const backgroundColors = [
+               "rgba(255, 99, 132, 0.8)", // Đỏ
+               "rgba(54, 162, 235, 0.8)", // Xanh dương
+               "rgba(255, 206, 86, 0.8)", // Vàng
+               "rgba(75, 192, 192, 0.8)", // Xanh ngọc
+               "rgba(153, 102, 255, 0.8)", // Tím
+            ];
+
+            const borderColors = [
+               "rgba(255, 99, 132, 1)",
+               "rgba(54, 162, 235, 1)",
+               "rgba(255, 206, 86, 1)",
+               "rgba(75, 192, 192, 1)",
+               "rgba(153, 102, 255, 1)",
+            ];
+
+            const chartData2 = {
+               labels: labels,
+               datasets: [
+                  {
+                     label: "Tỉ lệ đạt",
+                     data: tyLeDat,
+                     backgroundColor: backgroundColors,
+                     borderColor: borderColors,
+                     borderWidth: 1,
+                  },
+               ],
+            };
+
+            const config2 = {
+               type: "bar",
+               data: chartData2,
+               options: {
+                  responsive: true,
+                  plugins: {
+                     legend: {
+                        display: true,
+                        labels: {
+                           font: {
+                              size: 16,
+                           },
+                        },
+                     },
+                     title: {
+                        display: true,
+                        text: "Tỉ lệ đạt giữa các lớp",
+                        font: {
+                           size: 20,
+                        },
+                     },
+                  },
+                  scales: {
+                     y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                           callback: function (value) {
+                              return value + "%"; // Thêm ký hiệu %
+                           },
+                        },
+                     },
+                  },
+               },
+            };
+
+            new Chart(ctx2, config2);
+         });
+
+      console.log("Kích hoạt!");
+   }
+
+   // Hàm kiểm tra xem tất cả các select có giá trị chưa
+   function checkSelectValues() {
+      // Kiểm tra nếu tất cả các select đều có giá trị
+      if (selectMonHoc.value && selectHocKy.value && selectKhoiLop.value) {
+         // Kích hoạt nút nếu tất cả các select có giá trị
+         renderTongKet();
+      }
+   }
+
+   // Lắng nghe sự kiện thay đổi của các select
+   selectMonHoc.addEventListener("change", checkSelectValues);
+   selectHocKy.addEventListener("change", checkSelectValues);
+   selectKhoiLop.addEventListener("change", checkSelectValues);
+
+   checkSelectValues();
+</script>
+{% endblock %}

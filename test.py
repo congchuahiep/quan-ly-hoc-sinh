@@ -24,6 +24,28 @@ with app.app_context():
     # print(hs)
     # print(lp)
     # print([h.nam_hoc for h in hk])
-    bang_diem = BangDiem.query.get(10261).get_bang_diem()
-    print(bang_diem)
+    
+    
+    mon_hoc_id = 1
+    hoc_ky_id = 241
+    khoi_lop = 10
+    
+    lop_hocs = LopHoc.query.filter(
+        LopHoc.hai_hoc_ky.any(HocKy.id == hoc_ky_id),
+        LopHoc.khoi_lop == KhoiLop(khoi_lop))
+    
+    danh_sach_tong_ket = []
+    
+    for lop_hoc in lop_hocs:
+        tong_dat = lop_hoc.tinh_tong_dat_mon_hoc(mon_hoc_id, hoc_ky_id)
+        ty_le_dat = lop_hoc.ty_le_dat_mon_hoc(tong_dat)
+        
+        tong_ket = {
+            "ten_lop": lop_hoc.ten_lop,
+            "tong_dat": tong_dat,
+            "ty_le_dat": ty_le_dat
+        }
+        danh_sach_tong_ket.append(tong_ket)
+    
+    print(danh_sach_tong_ket)
     
