@@ -1,8 +1,9 @@
 from datetime import date
 from enum import Enum as PyEnum
 import hashlib
+import json
 import random
-from sqlalchemy import Column, Enum, Integer, String, Float, ForeignKey, Date, extract
+from sqlalchemy import Column, Enum, Integer, String, Float, ForeignKey, Date, extract, or_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
@@ -90,6 +91,38 @@ class GiaoVien(NguoiDung):
     def get_lop_chu_nhiem(self, nam_hoc):
         return LopHoc.query.filter(LopHoc.giao_vien_chu_nhiem_id == self.id, LopHoc.nam_hoc == nam_hoc).first()
     
+    def get_bang_diem_mon_hoc(self, mon_hoc_id, hoc_ky_id, lop_hoc_id):
+        lop_hoc = LopHoc.query.get(lop_hoc_id)
+        danh_sach_diem = lop_hoc.get_danh_sach_diem(mon_hoc_id, hoc_ky_id)
+        
+        return danh_sach_diem
+        
+    def get_lop_giao_vien_day(self, hoc_ky_id=None):
+        lop_hoc_query = LopHoc.query.join(DayLop, DayLop.lop_hoc_id == LopHoc.id).filter(DayLop.giao_vien_id == self.id)
+        
+        if hoc_ky_id:
+            return lop_hoc_query.filter(DayLop.hoc_ky_id == hoc_ky_id).all()
+        
+        return lop_hoc_query.all()
+    
+    def get_info_lop_giao_vien_day(self, hoc_ky_id):
+        danh_sach_day_lop = []
+        lop_giao_vien_days = DayLop.query.filter(DayLop.giao_vien_id == self.id, DayLop.hoc_ky_id == hoc_ky_id)
+        
+        for lop_giao_vien_day in lop_giao_vien_days:
+            ten_mon_hoc = MonHoc.query.get(lop_giao_vien_day.mon_hoc_id).ten_mon_hoc
+            ten_lop_hoc = LopHoc.query.get(lop_giao_vien_day.lop_hoc_id).ten_lop
+            
+            info_day_lop = {
+                "mon_hoc_id": lop_giao_vien_day.mon_hoc_id,
+                "ten_mon_hoc": ten_mon_hoc,
+                "lop_hoc_id": lop_giao_vien_day.lop_hoc_id,
+                "ten_lop_hoc": ten_lop_hoc
+            }
+            danh_sach_day_lop.append(info_day_lop)
+        
+        return danh_sach_day_lop
+    
     def get_dashboard_data(self):
         return []
     
@@ -99,7 +132,7 @@ class GiaoVien(NguoiDung):
     @staticmethod
     def tim_giao_vien_khong_chu_nhiem(nam_hoc):
         return GiaoVien.query.filter(
-                ~GiaoVien.lop_chu_nhiem.has(LopHoc.nam_hoc == nam_hoc)
+                ~GiaoVien.lop_chu_nhiem.any(LopHoc.nam_hoc == nam_hoc)
             ).all()
 
 
@@ -204,13 +237,55 @@ class LopHoc(db.Model):
         return (phan_so, phan_chu)
      
     def get_danh_sach_hoc_sinh(self, trang_thai="DangHoc", doi_tuong=False):
-        hoc_sinh_lops = HocSinhLop.query.filter(HocSinhLop.lop_hoc_id == self.id, HocSinhLop.trang_thai == trang_thai).all()
+        
+        if trang_thai == "DangHoc":
+            hoc_sinh_lops = HocSinhLop.query.filter(
+                HocSinhLop.lop_hoc_id == self.id,
+                or_(HocSinhLop.trang_thai == "HocXong", HocSinhLop.trang_thai == trang_thai)).all()
+        else:
+            hoc_sinh_lops = HocSinhLop.query.filter(
+                HocSinhLop.lop_hoc_id == self.id,
+                HocSinhLop.trang_thai == trang_thai).all()
         
         if doi_tuong:
             return [hoc_sinh_lop.hoc_sinh for hoc_sinh_lop in hoc_sinh_lops]
         
         return hoc_sinh_lops
     
+    def get_danh_sach_diem(self, mon_hoc_id, hoc_ky_id):
+        hoc_sinhs = self.get_danh_sach_hoc_sinh(doi_tuong=True)
+        print(hoc_sinhs)
+        
+        danh_sach_diem = []
+        
+        for hoc_sinh in hoc_sinhs:
+            bang_diem = hoc_sinh.get_bang_diem(mon_hoc_id, hoc_ky_id)
+            
+            diem_15_phuts = bang_diem.diem_15_phuts
+            diem_mot_tiets = bang_diem.diem_mot_tiets
+            
+            danh_sach_diem_15_phut = []
+            danh_sach_diem_mot_tiet = []
+            
+            for diem_15_phut in diem_15_phuts:
+                danh_sach_diem_15_phut.append(diem_15_phut.diem)
+                
+            for diem_mot_tiet in diem_mot_tiets:
+                danh_sach_diem_mot_tiet.append(diem_mot_tiet.diem)
+            
+            bang_diem_hoc_sinh = {
+                "id": bang_diem.id,
+                "ho_hoc_sinh": hoc_sinh.ho,
+                "ten_hoc_sinh": hoc_sinh.ten,
+                "danh_sach_diem_15_phut": danh_sach_diem_15_phut,
+                "danh_sach_diem_mot_tiet": danh_sach_diem_mot_tiet,
+                "diem_cuoi_ky": bang_diem.diem_cuoi_ky,
+            }
+            
+            danh_sach_diem.append(bang_diem_hoc_sinh)
+            
+        return danh_sach_diem
+        
     @staticmethod
     def them_cac_hoc_sinh_vao_lop(lop_hoc, hoc_sinhs, ngay_bat_dau=date.today()):
         # Thêm học sinh vào lớp
@@ -249,6 +324,7 @@ class LopHoc(db.Model):
         if (len(cac_giao_vien_chu_nhiem) < so_luong):
             raise ValueError("Không còn đủ giáo viên để xếp lớp!")
         
+        hai_hoc_ky_moi = HocKy.query.filter(HocKy.nam_hoc == nam_hoc).all()
         for i in range(so_luong):
             ten_lop = "10" + chr(65 + i)
             
@@ -259,7 +335,7 @@ class LopHoc(db.Model):
                 khoi_lop=KhoiLop(10),
                 giao_vien_chu_nhiem_id=cac_giao_vien_chu_nhiem[i].id
             )
-            
+            lop_hoc.hai_hoc_ky.extend(hai_hoc_ky_moi)
             db.session.add(lop_hoc)
         db.session.commit()
         
@@ -330,7 +406,7 @@ class LopHoc(db.Model):
             db.session.commit()
             
     def tao_bang_diem_cho_lop(self, mon_hoc, hoc_ky_id):
-        hoc_sinh_lops = self.get_danh_sach_hoc_sinh(trang_thai="HocXong")
+        hoc_sinh_lops = self.get_danh_sach_hoc_sinh()
         
         for hoc_sinh_lop in hoc_sinh_lops:
             hoc_sinh = HocSinh.query.get(hoc_sinh_lop.hoc_sinh_id)
@@ -341,9 +417,6 @@ class LopHoc(db.Model):
             )
             db.session.add(bang_diem)
         db.session.commit()
-        
-        
-        
     
     def len_lop(self, ngay_bat_dau=date.today()):
         khoi_lop, loai_lop = self.tach_ten_lop()
@@ -373,7 +446,7 @@ class LopHoc(db.Model):
             id=str(nam_hoc_moi) + ten_lop_moi,
             nam_hoc=nam_hoc_moi,
             ten_lop=ten_lop_moi,
-            khoi_lop=KhoiLop(khoi_lop),
+            khoi_lop=KhoiLop(khoi_lop + 1),
             giao_vien_chu_nhiem_id=self.giao_vien_chu_nhiem_id
         )
         lop_moi.hai_hoc_ky.append(hoc_ky_mot_moi)
@@ -397,6 +470,8 @@ class LopHoc(db.Model):
             
         db.session.commit()
 
+    def to_json(self):
+        return {"id": self.id, "ten_lop": self.ten_lop}
 
 class DayLop(db.Model):
     __tablename__ = 'DayLop'
@@ -440,6 +515,13 @@ class HocSinh(db.Model):
         self.dien_thoai = dien_thoai
         self.dia_chi = dia_chi
         self.gioi_tinh = gioi_tinh
+        
+    def get_bang_diem(self, mon_hoc_id, hoc_ky_id):
+        return BangDiem.query.filter(
+            BangDiem.hoc_sinh_id == self.id,
+            BangDiem.hoc_ky_id == hoc_ky_id,
+            BangDiem.mon_hoc_id == mon_hoc_id
+        ).first()
 
 
 class HocSinhLop(db.Model):
@@ -533,22 +615,51 @@ class BangDiem(db.Model):
         self.add_cot_diem_15_phut()
         self.add_cot_diem_mot_tiet()
         
+    def get_bang_diem(self):
+        bang_diem = {
+            "id": self.id,
+            "diem_15_phut": {
+                diem.id: diem.diem for diem in self.diem_15_phuts
+            },
+            "diem_mot_tiet": {
+                diem.id: diem.diem for diem in self.diem_mot_tiets
+            },
+            "diem_cuoi_ky": self.diem_cuoi_ky
+        }
+        
+        return bang_diem
+        
     def add_cot_diem_15_phut(self, diem=None):
         # Kiểm tra số lượng bảng điểm
         if (len(self.diem_15_phuts) + 1 > 5):
             raise ValueError("Tối đa chỉ được 5 cột điểm 15 phút!")
+        # Kiểm tra xem điểm có hợp lệ (từ 0 đến 10) không
+        if diem is not None:
+            if not (0 <= diem <= 10):
+                raise ValueError("Điểm phải nằm trong khoảng từ 0 đến 10!")
+        
         diem_moi = Diem15Phut(diem=diem)
         self.diem_15_phuts.append(diem_moi)
         db.session.add(diem_moi)
-        db.session.commit()
         
     def add_cot_diem_mot_tiet(self, diem=None):
         if (len(self.diem_mot_tiets) + 1 > 3):
             raise ValueError("Tối đa chỉ được 3 cột điểm một tiết!")
+    
+        # Kiểm tra xem điểm có hợp lệ (từ 0 đến 10) không
+        if diem is not None:
+            if not (0 <= diem <= 10):
+                raise ValueError("Điểm phải nằm trong khoảng từ 0 đến 10!")
+        
         diem_moi = DiemMotTiet(diem=diem)
         self.diem_mot_tiets.append(diem_moi)
         db.session.add(diem_moi)
-        db.session.commit()
+        
+    def refresh_cot_diem_15_phut(self):
+        self.diem_15_phuts = []
+        
+    def refresh_cot_diem_mot_tiet(self):
+        self.diem_mot_tiets = []
     
     def xoa_cot_diem_15_phut(self, index_cot):
         # Kiểm tra số lượng bảng điểm
@@ -569,18 +680,15 @@ class BangDiem(db.Model):
         if len(diem_15_phuts) == 0:
             raise ValueError("Lỗi kỳ lạ! Không có bảng điểm 15 phút nào tồn tại!")
         diem_15_phuts[index_cot].update_diem(diem)
-        db.session.commit()
     
     def update_diem_mot_tiet(self, diem, index_cot=0):
         diem_mot_tiets = self.diem_mot_tiets
         if len(diem_mot_tiets) == 0:
             raise ValueError("Lỗi kỳ lạ! Không có bảng điểm 15 phút nào tồn tại!")
         diem_mot_tiets[index_cot].update_diem(diem)
-        db.session.commit()
         
     def update_diem_cuoi_ky(self, diem):
         self.diem_cuoi_ky = diem
-        db.session.commit()
     
 
 class Diem15Phut(db.Model):

@@ -1,7 +1,7 @@
 {% extends "sidebar.html" %} {% block content %}
 <div class="container-fluid p-5">
    {% if si_so != 0 %}
-   <div class="d-flex flex-fluid mb-5 gap-3">
+   <div class="d-flex flex-fluid mb-5 gap-3 justify-content-end">
       <div class="card p-3" style="width: 128px">
          <h5 class="mt-2">Tên lớp</h5>
          <p class="text-end">{{ lop_hoc.ten_lop }}</p>
@@ -37,13 +37,13 @@
       <tbody class="">
          {% for hocsinh in danh_sach_lop%}
          <tr>
-            <td class="col-1" scope="row">{{hocsinh.id}}</td>
-            <td class="col-3 text-end">{{hocsinh.ho}}</td>
-            <td class="col-1">{{hocsinh.ten}}</td>
-            <td class="col-2">{{hocsinh.ngay_sinh}}</td>
-            <td class="col-2">{{hocsinh.dia_chi}}</td>
-            <td class="col-2">{{hocsinh.dien_thoai}}</td>
-            <td class="col-1">{{hocsinh.email}}</td>
+            <td scope="row">{{hocsinh.id}}</td>
+            <td class="text-end">{{hocsinh.ho}}</td>
+            <td>{{hocsinh.ten}}</td>
+            <td>{{hocsinh.ngay_sinh}}</td>
+            <td>{{hocsinh.dia_chi}}</td>
+            <td>{{hocsinh.dien_thoai}}</td>
+            <td>{{hocsinh.email}}</td>
          </tr>
          {% endfor %}
       </tbody>

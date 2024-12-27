@@ -1,2 +1,495 @@
 {% extends "sidebar.html" %} {% block content %}
+<div class="container-fluid p-5">
+   <div class="card mb-5 p-3">
+      <h5 class="mt-3">Chọn bảng điểm</h5>
+      <div class="row gap-3 mb-2 justify-content-end p-3">
+         <div class="col">
+            <label class="form-label" for="selectHocKy">Học kỳ</label>
+            <select class="form-select" id="selectHocKy">
+               <option selected disabled>Chọn học kỳ</option>
+               {% for hoc_ky in danh_sach_hoc_ky %}
+               <option value="{{hoc_ky.id}}">{{hoc_ky.id}}</option>
+               {% endfor %}
+            </select>
+         </div>
+         <div class="col">
+            <label class="form-label" for="selectLopHoc">Lớp học</label>
+            <select class="form-select" id="selectLopHoc" disabled>
+               <option selected disabled id="firstOption">Chọn lớp học</option>
+            </select>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div id="notification"></div>
+
+<table class="table table-hover p-3 mb-3 table-bordered">
+   <thead>
+      <tr>
+         <th class="col-1" scope="col">STT</th>
+         <th class="col-2" scope="col">Họ</th>
+         <th class="col-1" scope="col">Tên</th>
+         <th class="col-3" scope="col">Điểm 15 phút</th>
+         <th class="col-2" scope="col">Điểm 1 tiết</th>
+         <th class="col-2" scope="col">Điểm cuối kỳ</th>
+         <th class="col-1" scope="col">Sửa</th>
+      </tr>
+   </thead>
+   <tbody id="bangDiemTable"></tbody>
+</table>
+
+<div class="modal fade" id="suaDiemModal" tabindex="-1">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">
+               Chỉnh sửa điểm
+            </h1>
+            <button
+               type="button"
+               class="btn-close"
+               data-bs-dismiss="modal"
+               aria-label="Close"
+            ></button>
+         </div>
+         <div class="modal-body" id="thongTinSuaDiem"></div>
+         <div class="modal-footer">
+            <button
+               type="button"
+               class="btn btn-secondary"
+               data-bs-dismiss="modal"
+            >
+               Đóng
+            </button>
+            <button type="button" class="btn btn-primary" id="saveDiem">
+               Lưu thay đổi
+            </button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!--Truy vấn lớp học và gắn lên select-->
+<script>
+   // Lấy phần tử select học kỳ
+   const selectHocKy = document.getElementById("selectHocKy");
+
+   // Lắng nghe học kỳ thay đổi giá trị
+   selectHocKy.addEventListener("change", function () {
+      const hoc_ky_id = selectHocKy.value;
+
+      const notification = document.getElementById("notification");
+      notification.innerHTML = ``;
+
+      const bangDiemTable = document.getElementById("bangDiemTable");
+
+      bangDiemTable.innerHTML = ``;
+
+      fetch("/get-teach-class", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ hoc_ky_id: hoc_ky_id }),
+      })
+         .then((response) => {
+            if (!response.ok) {
+               throw new Error("Không thể tìm kiếm lớp học mà giáo viên dạy!");
+            }
+            return response.json(); // Chuyển đổi phản hồi thành JSON
+         })
+         .then((data) => {
+            const selectLopHoc = document.getElementById("selectLopHoc");
+            selectLopHoc.disabled = false;
+
+            // Xoá mọi option cũ để lại option đầu (vì không tính option đầu tiên)
+            selectLopHoc.innerHTML = `<option selected disabled id="firstOption">Chọn lớp học</option>`;
+
+            console.log(data.length);
+
+            // Nếu danh sách lớp học trống (vì không tính option đầu tiên)
+            // khoá select lại và không báo giáo viên không dạy lớp nào cả
+            if (data.length == 0) {
+               selectLopHoc.disabled = true;
+               selectLopHoc.innerHTML = `<option selected disabled id="firstOption">Kỳ này bạn không dạy lớp nào!</option>`;
+            }
+
+            // Tạo option mới gán vô ô select
+            data.forEach((dayLopHoc) => {
+               const selectLopHocOption = document.createElement("option");
+               selectLopHocOption.textContent =
+                  dayLopHoc["ten_lop_hoc"] + " - " + dayLopHoc["ten_mon_hoc"];
+               selectLopHocOption.value =
+                  dayLopHoc["lop_hoc_id"] + "," + dayLopHoc["mon_hoc_id"];
+               selectLopHoc.appendChild(selectLopHocOption);
+            });
+         })
+         .catch((error) => {
+            console.error("Có lỗi xảy ra:", error);
+         });
+   });
+</script>
+
+<!--Truy vấn bảng điểm và render bảng-->
+<script>
+   // Lấy phần tử select lớp học
+   const selectLopHoc = document.getElementById("selectLopHoc");
+
+   // Lắng nghe học kỳ thay đổi giá trị
+   selectLopHoc.addEventListener("change", function () {
+      const lopHocMonHoc = selectLopHoc.value;
+
+      const notification = document.getElementById("notification");
+      notification.innerHTML = ``;
+
+      // Nếu là phần tử đầu tiên (phần tử này dị hợm) thì không thực thi
+      if (lopHocMonHoc == selectLopHoc.options[0].value) {
+         return;
+      }
+
+      const selectHocKy = document.getElementById("selectHocKy");
+      const hoc_ky_id = selectHocKy.value;
+      const [lop_hoc_id, mon_hoc_id] = lopHocMonHoc.split(/\s*,\s*/);
+
+      fetch("/score", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+            hoc_ky_id: hoc_ky_id,
+            lop_hoc_id: lop_hoc_id,
+            mon_hoc_id: Number(mon_hoc_id),
+         }),
+      })
+         .then((response) => {
+            if (!response.ok) {
+               throw new Error("Bảng điểm kỳ này chưa mở!");
+            }
+            return response.json(); // Chuyển đổi phản hồi thành JSON
+         })
+         .then((data) => {
+            console.log(data);
+            const bangDiemTable = document.getElementById("bangDiemTable");
+
+            bangDiemTable.innerHTML = ``;
+
+            // Thêm dữ liệu vào bảng
+            data.forEach((item, index) => {
+               const row = document.createElement("tr");
+
+               row.dataset.id = item["id"];
+
+               const indexCell = document.createElement("td");
+               indexCell.textContent = index + 1;
+               row.appendChild(indexCell);
+
+               const hoCell = document.createElement("td");
+               hoCell.textContent = item["ho_hoc_sinh"];
+               row.appendChild(hoCell);
+
+               const tenCell = document.createElement("td");
+               tenCell.textContent = item["ten_hoc_sinh"];
+               row.appendChild(tenCell);
+
+               const diem15Phut = document.createElement("td");
+               diem15Phut.textContent =
+                  item["danh_sach_diem_15_phut"].join(", ");
+               row.appendChild(diem15Phut);
+
+               const diemMotTiet = document.createElement("td");
+               diemMotTiet.textContent =
+                  item["danh_sach_diem_mot_tiet"].join(", ");
+               row.appendChild(diemMotTiet);
+
+               const diemCuoiKy = document.createElement("td");
+               diemCuoiKy.textContent = item["diem_cuoi_ky"];
+               row.appendChild(diemCuoiKy);
+
+               const nutSua = document.createElement("button");
+               nutSua.textContent = "Sửa điểm";
+               nutSua.type = "button";
+               nutSua.className = "btn btn-warning btn-sm";
+               nutSua.dataset.bsToggle = "modal";
+               nutSua.dataset.bsTarget = "#suaDiemModal";
+
+               // Gắn sự kiện click cho nút sửa
+               nutSua.addEventListener("click", function () {
+                  const notification = document.getElementById("notification");
+                  notification.innerHTML = ``;
+
+                  // Lấy dữ liệu từ hàng tương ứng
+                  const hoHocSinh = row
+                     .querySelector("td:nth-child(2)")
+                     .textContent.trim();
+                  const tenHocSinh = row
+                     .querySelector("td:nth-child(3)")
+                     .textContent.trim();
+                  const danhSachDiem15phut = row
+                     .querySelector("td:nth-child(4)")
+                     .textContent.trim()
+                     .split(/\s*,\s*/);
+                  const danhSachDiemMotTiet = row
+                     .querySelector("td:nth-child(5)")
+                     .textContent.trim()
+                     .split(/\s*,\s*/);
+                  const diemCuoiKy = row
+                     .querySelector("td:nth-child(6)")
+                     .textContent.trim();
+
+                  // Điền dữ liệu vào modal
+                  const thongTinSuaDiem =
+                     document.getElementById("thongTinSuaDiem");
+                  thongTinSuaDiem.innerHTML = `
+                         <form id="formSuaDiem" class="fluid">
+                            <input type="text" class="form-control" value="${
+                               row.dataset.id
+                            }" id="bangDiemID" hidden>
+                            <div class="mb-3">
+                                  <label for="hoTenHocSinhInput" class="form-label">Họ học sinh</label>
+                                  <input type="text" class="form-control" id="hoTenHocSinhInput" value="${hoHocSinh} ${tenHocSinh}" disabled>
+                            </div>
+                            <div class="mb-3" id="diem15PhutContainer">
+                                  <label for="diem15PhutInput" class="form-label">Điểm 15 phút</label>
+                                  ${danhSachDiem15phut
+                                     .map(
+                                        (diem, index) =>
+                                           `<div class="input-group mb-2" data-index="${index}">
+                                                 <input type="number" class="form-control diem-15-phut" value="${diem}" min="0" max="10">
+                                                 <button type="button" class="btn btn-danger btn-remove-diem-15-phut" ${
+                                                    index === 0
+                                                       ? "disabled"
+                                                       : ""
+                                                 }>-</button>
+                                             </div>`
+                                     )
+                                     .join("")}
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                               <button type="button" class="btn btn-success" id="btn-add-diem-15-phut" ${
+                                  danhSachDiem15phut.length === 5
+                                     ? "disabled"
+                                     : ""
+                               }>Thêm điểm 15 phút</button>
+                            </div>
+                            <div class="mb-3" id="diemMotTietContainer">
+                              <label for="diemMotTietInput" class="form-label">Điểm một tiết</label>
+                              ${danhSachDiemMotTiet
+                                 .map(
+                                    (diem, index) =>
+                                       `<div class="input-group mb-2" data-index="${index}">
+                                             <input type="number" class="form-control diem-mot-tiet" value="${diem}" min="0" max="10">
+                                             <button type="button" class="btn btn-danger btn-remove-diem-mot-tiet" ${
+                                                index === 0 ? "disabled" : ""
+                                             }>-</button>
+                                         </div>`
+                                 )
+                                 .join("")}
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                              <button type="button" class="btn btn-success" id="btn-add-diem-mot-tiet" ${
+                                 danhSachDiemMotTiet.length === 3
+                                    ? "disabled"
+                                    : ""
+                              }>Thêm điểm một tiết</button>
+                           </div>
+                            <div class="mb-3">
+                                  <label for="diemCuoiKyInput" class="form-label">Điểm cuối kỳ</label>
+                                  <input type="number" class="form-control" id="diemCuoiKyInput" value="${diemCuoiKy}"  min="0" max="10">
+                            </div>
+                         </form>
+                      `;
+
+                  // Sự kiện thêm điểm 15 phút
+                  document
+                     .getElementById("btn-add-diem-15-phut")
+                     .addEventListener("click", function () {
+                        const container = document.getElementById(
+                           "diem15PhutContainer"
+                        );
+                        const currentInputs =
+                           container.querySelectorAll(".diem-15-phut");
+                        if (currentInputs.length < 5) {
+                           const index = currentInputs.length;
+                           const newInput = document.createElement("div");
+                           newInput.className = "input-group mb-2";
+                           newInput.dataset.index = index;
+                           newInput.innerHTML = `
+                               <input type="number" class="form-control diem-15-phut" value="">
+                               <button type="button" class="btn btn-danger btn-remove-diem-15-phut">-</button>
+                            `;
+                           container.appendChild(newInput);
+
+                           // Gắn sự kiện xóa cho nút mới
+                           newInput
+                              .querySelector(".btn-remove-diem-15-phut")
+                              .addEventListener(
+                                 "click",
+                                 handleRemoveDiem15phut
+                              );
+                        }
+                     });
+
+                  // Sự kiện thêm điểm một tiết
+                  document
+                     .getElementById("btn-add-diem-mot-tiet")
+                     .addEventListener("click", function () {
+                        const container = document.getElementById(
+                           "diemMotTietContainer"
+                        );
+                        const currentInputs =
+                           container.querySelectorAll(".diem-mot-tiet");
+                        if (currentInputs.length < 3) {
+                           const index = currentInputs.length;
+                           const newInput = document.createElement("div");
+                           newInput.className = "input-group mb-2";
+                           newInput.dataset.index = index;
+                           newInput.innerHTML = `
+                               <input type="number" class="form-control diem-mot-tiet" value="">
+                               <button type="button" class="btn btn-danger btn-remove-diem-mot-tiet">-</button>
+                            `;
+                           container.appendChild(newInput);
+
+                           // Gắn sự kiện xóa cho nút mới
+                           newInput
+                              .querySelector(".btn-remove-diem-mot-tiet")
+                              .addEventListener(
+                                 "click",
+                                 handleRemoveDiem15phut
+                              );
+                        }
+                     });
+
+                  // Sự kiện xóa điểm 15 phút
+                  function handleRemoveDiem15phut(event) {
+                     const inputGroup = event.target.closest(".input-group");
+                     const container = document.getElementById(
+                        "diem15PhutContainer"
+                     );
+                     if (
+                        container.querySelectorAll(".diem-15-phut").length > 1
+                     ) {
+                        inputGroup.remove();
+                     }
+                  }
+                  document
+                     .querySelectorAll(".btn-remove-diem-15-phut")
+                     .forEach((btn) =>
+                        btn.addEventListener("click", handleRemoveDiem15phut)
+                     );
+
+                  // Sự kiện xóa điểm một tiết
+                  function handleRemoveDiemMotTiet(event) {
+                     const inputGroup = event.target.closest(".input-group");
+                     const container = document.getElementById(
+                        "diemMotTietContainer"
+                     );
+                     if (
+                        container.querySelectorAll(".diem-mot-tiet").length > 1
+                     ) {
+                        inputGroup.remove();
+                     }
+                  }
+                  document
+                     .querySelectorAll(".btn-remove-diem-mot-tiet")
+                     .forEach((btn) =>
+                        btn.addEventListener("click", handleRemoveDiemMotTiet)
+                     );
+               });
+
+               row.appendChild(nutSua);
+
+               bangDiemTable.appendChild(row);
+            });
+         })
+         .catch((error) => {
+            const notification = document.getElementById("notification");
+            notification.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+               ${error.message}
+            </div> `;
+         });
+   });
+
+   document.getElementById("saveDiem").addEventListener("click", function () {
+      const formSuaDiem = document.getElementById("formSuaDiem");
+
+      // Lấy tất cả các trường điểm 15 phút
+      const bangDiemInput = formSuaDiem.querySelector("#bangDiemID");
+      const diem15PhutInputs = formSuaDiem.querySelectorAll(".diem-15-phut");
+      const diemMotTietInputs = formSuaDiem.querySelectorAll(".diem-mot-tiet");
+      const diemCuoiKyInput = formSuaDiem.querySelector("#diemCuoiKyInput");
+
+      // Tạo cấu trúc dữ liệu từ form
+      bangDiemID = bangDiemInput.value;
+      diemCuoiKy = diemCuoiKyInput.value;
+
+      const diem15PhutValues = Array.from(diem15PhutInputs).map((input) => {
+         return parseFloat(input.value.trim()) || 0;
+      });
+
+      const diemMotTietValues = Array.from(diemMotTietInputs).map((input) => {
+         return parseFloat(input.value.trim()) || 0; // Đảm bảo số hợp lệ, nếu không sẽ là 0
+      });
+
+      bang_diem = {
+         bang_diem_id: bangDiemID,
+         diem_15_phuts: diem15PhutValues,
+         diem_mot_tiets: diemMotTietValues,
+         diem_cuoi_ky: diemCuoiKy,
+      };
+
+      // Hiển thị cấu trúc dữ liệu trong console
+      console.log(bang_diem);
+
+      fetch("/update_bang_diem", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+            bang_diem: bang_diem,
+         }),
+      })
+         .then((response) => {
+            if (!response.ok) {
+               // Kiểm tra xem response có thành công không
+               return response.json().then((errorData) => {
+                  throw new Error(errorData.error); // Ném lỗi về phía catch
+               });
+            }
+            return response.json(); // Nếu không có lỗi, trả về dữ liệu
+         })
+         .then(() => {
+            const row = document.querySelector(`tr[data-id='${bangDiemID}']`);
+
+            if (row) {
+               // Cập nhật điểm 15 phút
+               row.querySelector("td:nth-child(4)").textContent =
+                  diem15PhutValues.join(", ");
+
+               // Cập nhật điểm một tiết
+               row.querySelector("td:nth-child(5)").textContent =
+                  diemMotTietValues.join(", ");
+
+               // Cập nhật điểm cuối kỳ
+               row.querySelector("td:nth-child(6)").textContent = diemCuoiKy;
+            }
+
+            const notification = document.getElementById("notification");
+            notification.innerHTML = `
+            <div class="alert alert-primary" role="alert">
+               Sửa điểm thành công!
+            </div> `;
+         })
+         .catch((error) => {
+            const notification = document.getElementById("notification");
+            notification.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+               Sửa điểm thất bại! ${error.message}
+            </div>`;
+         });
+
+      // Đóng modal
+      const modal = bootstrap.Modal.getInstance(
+         document.getElementById("suaDiemModal")
+      );
+      modal.hide();
+   });
+</script>
 {% endblock %}

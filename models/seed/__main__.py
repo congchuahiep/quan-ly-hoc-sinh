@@ -192,7 +192,6 @@ def tao_bang_diem():
     
     for nam_hoc in [21, 22, 23, 24]:
         lop_hocs = LopHoc.query.filter(LopHoc.nam_hoc == nam_hoc).all()
-        
         for lop_hoc in lop_hocs:
             (hoc_ky_mot, hoc_ky_hai) = get_hoc_ky(nam_hoc)
             
@@ -256,7 +255,7 @@ if __name__ == '__main__':
         phan_lop_giao_vien()
         
         # Tạo bảng điểm
-        print("Tạo bảng điểm, rất nhiều bảng điểm, quá trình này có thể mất 10 phút")
+        print("Tạo bảng điểm, rất nhiều bảng điểm, quá trình này có thể mất 30 phút")
         print("Tạo dữ liệu bảng điểm, hơn 10000 bảng điểm nên hơi lâu")
         tao_bang_diem()
         print("Tạo chèn số điểm, hơn 10000 điểm 15 phút và 10000 điểm một tiết nên hơi lâu")
