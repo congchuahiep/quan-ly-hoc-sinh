@@ -226,7 +226,6 @@ def policy():
 def update_policy():
     from models import QuyDinh
     from app import db
-    user = current_user._get_current_object()
     
     try:
         quy_dinh_id = request.json.get('quy_dinh_id')
@@ -245,4 +244,20 @@ def update_policy():
     except Exception as e:
         return jsonify({"error": "Đã xảy ra lỗi, vui lòng thử lại."}), 500  # Trả về mã lỗi 500 cho lỗi khác
     
+
+@app.route("/apply-student")
+@login_required
+@role_required('NhanVien')
+def apply_student():
+    user = current_user._get_current_object()
     
+    # Basic data
+    basic_info = user.get_basic_info()
+    nav_items = user.get_nav_item_by_role()
+    
+    return render_template(
+        'apply-student.html',
+        title='Tiếp nhận học sinh',
+        basic_info=basic_info,
+        nav_items=nav_items,
+    )

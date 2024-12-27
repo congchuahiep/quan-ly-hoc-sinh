@@ -158,8 +158,7 @@ class NhanVien(NguoiDung):
     def get_nav_item_by_role(self):
         return [
                 {'href': 'dashboard', 'icon': '<i class="bi bi-grid me-2"></i>', 'title': 'Tổng quan'},
-                {'href': 'login', 'icon': '', 'title': 'Contact'},
-                {'href': 'login', 'icon': '', 'title': 'Setting'},
+                {'href': 'apply-student', 'icon': '<i class="bi bi-person-plus-fill me-2"></i>', 'title': 'Tiếp nhận học sinh'},
         ]
     
     def get_role(self):
