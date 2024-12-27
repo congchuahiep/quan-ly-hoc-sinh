@@ -65,6 +65,20 @@ class NguoiDung(db.Model, UserMixin):
             'role': self.get_role()
         }
         
+    def get_dashboard_data(self):
+        
+        total_hoc_sinh = db.session.query(HocSinh).count()
+        total_giao_vien = db.session.query(GiaoVien).count()
+        total_nhan_vien = db.session.query(NhanVien).count()
+        ti_le_dat = str(100) + "%"
+        
+        return [
+            {'title': 'Học sinh', 'value': total_hoc_sinh, 'icon': '<i class="bi bi-person fs-2"></i>'},
+            {'title': 'Giáo viên', 'value': total_giao_vien, 'icon': '<i class="bi bi-person-workspace fs-2"></i>'},
+            {'title': 'Nhân viên', 'value': total_nhan_vien, 'icon': '<i class="bi bi-briefcase fs-2"></i>'},
+            {'title': 'Tỉ lệ đạt', 'value': ti_le_dat, 'icon': '<i class="bi bi-bar-chart-line fs-2"></i>'}
+        ]
+        
     def check_loai_nguoi_dung(self, loai_nguoi_dung: str):
         return self.loai_nguoi_dung == loai_nguoi_dung
         
@@ -123,9 +137,6 @@ class GiaoVien(NguoiDung):
         
         return danh_sach_day_lop
     
-    def get_dashboard_data(self):
-        return []
-    
     def get_role(self):
         return "Giáo viên"
     
@@ -143,22 +154,6 @@ class NhanVien(NguoiDung):
     __mapper_args__ = {
         'polymorphic_identity': 'NhanVien',
     }
-    
-
-    
-    def get_dashboard_data(self):
-        
-        total_hoc_sinh = db.session.query(HocSinh).count()
-        total_giao_vien = db.session.query(GiaoVien).count()
-        total_nhan_vien = db.session.query(NhanVien).count()
-        ti_le_dat = str(100) + "%"
-        
-        return [
-            {'title': 'Học sinh', 'value': total_hoc_sinh, 'icon': '<i class="bi bi-person fs-2"></i>'},
-            {'title': 'Giáo viên', 'value': total_giao_vien, 'icon': '<i class="bi bi-person-workspace fs-2"></i>'},
-            {'title': 'Nhân viên', 'value': total_nhan_vien, 'icon': '<i class="bi bi-briefcase fs-2"></i>'},
-            {'title': 'Tỉ lệ đạt', 'value': ti_le_dat, 'icon': '<i class="bi bi-bar-chart-line fs-2"></i>'}
-        ]
     
     def get_nav_item_by_role(self):
         return [
@@ -178,20 +173,6 @@ class QuanTri(NguoiDung):
     __mapper_args__ = {
         'polymorphic_identity': 'QuanTri',
     }
-    
-    def get_dashboard_data(self):
-        
-        total_hoc_sinh = db.session.query(HocSinh).count()
-        total_giao_vien = db.session.query(GiaoVien).count()
-        total_nhan_vien = db.session.query(NhanVien).count()
-        ti_le_dat = str(100) + "%"
-        
-        return [
-            {'title': 'Học sinh', 'value': total_hoc_sinh, 'icon': '<i class="bi bi-person fs-2"></i>'},
-            {'title': 'Giáo viên', 'value': total_giao_vien, 'icon': '<i class="bi bi-person-workspace fs-2"></i>'},
-            {'title': 'Nhân viên', 'value': total_nhan_vien, 'icon': '<i class="bi bi-briefcase fs-2"></i>'},
-            {'title': 'Tỉ lệ đạt', 'value': ti_le_dat, 'icon': '<i class="bi bi-bar-chart-line fs-2"></i>'}
-        ]
     
     def get_nav_item_by_role(self):
         return [
